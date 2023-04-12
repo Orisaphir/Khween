@@ -1,0 +1,39 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "description": "Bot discord",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Orisaphir",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/rest": "^1.3.0",
+    "@napi-rs/canvas": "^0.1.30",
+    "discord-html-transcripts": "^3.1.2",
+    "discord-player": "^5.2.0",
+    "discord.js": "^14",
+    "emoji-name-map": "^1.2.9",
+    "emoji-regex": "^10.0.0",
+    "emoji-unicode-map": "^1.1.11",
+    "ffmpeg": "^0.0.4",
+    "ffmpeg-static": "^4.4.1",
+    "fs": "^0.0.1-security",
+    "java-util-random": "^1.0.0",
+    "ms": "^2.1.3",
+    "opusscript": "^0.0.8",
+    "prism-media": "^1.3.4",
+    "sequelize": "^6.13.0",
+    "sqlite3": "^5.0.2",
+    "ytdl-core": "^4.11.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Orisaphir/Zoe.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Orisaphir/Zoe/issues"
+  },
+  "homepage": "https://github.com/Orisaphir/Zoe#readme"
+}
