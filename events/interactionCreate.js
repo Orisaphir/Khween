@@ -196,8 +196,14 @@ module.exports = async (client, inter) => {
 						command.run(client, inter, command.options)
 					} catch {
 
-						let command = require(`../commands/info/${inter.commandName}`)
-						command.run(client, inter, command.options)
+						try {
+
+							let command = require(`../commands/info/${inter.commandName}`)
+							command.run(client, inter, command.options)
+						} catch {
+							let command = require(`../commands/admin/${inter.commandName}`)
+							command.run(client, inter, command.options)
+						}
 					}
 				}
 			}
