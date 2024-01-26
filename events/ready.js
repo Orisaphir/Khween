@@ -8,10 +8,7 @@ module.exports = async client => {
     await Emojis.sync();
 
     const Level = require("../modules/xp")
-    await Level.sync()
-
-    const Ticket = require("../modules/Ticket")
-    await Ticket.sync()
+    await Level.sync();
     
     const Admins = require("../modules/Admin")
     await Admins.sync();
@@ -19,7 +16,21 @@ module.exports = async client => {
     if (count === 0) {
         await Admins.bulkCreate([
             { Module: 'ticket', Valeur: false },
-            { Module: 'xp', Valeur: false }
+            { Module: 'xp', Valeur: false },
+            { Module: 'verify', Valeur: false} 
+        ]);
+    }
+
+    const Infos = require("../modules/Infos")
+    await Infos.sync()
+    const count2 = await Infos.count();
+    if (count2 === 0) {
+        await Infos.bulkCreate([
+            { Infos: 'openticket', Valeur: false },
+            { Infos: 'ticketchannel', Valeur: false },
+            { Infos: 'archiveticket', Valeur: false },
+            { Infos: 'verifychannel', Valeur: false },
+            { Infos: 'verifyrole', Valeur: false }
         ]);
     }
 

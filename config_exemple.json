@@ -1,6 +1,3 @@
 {
-    "BOT_TOKEN": "Your Bot Token",
-    "openticket": "Your main ticket message's channel id",
-    "ticketchannel": "Your ticket channel id",
-    "archiveticket": "Your archive ticket channel id"
+    "BOT_TOKEN": "Your Bot Token"
 }

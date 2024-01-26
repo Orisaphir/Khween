@@ -1,8 +1,16 @@
 module.exports = async (client, role) => {
-    const Emojis = require('./Emojis');
+    const Emojis = require('../modules/Emojis');
+    const Infos = require('../modules/Infos');
+    const Admins = require('../modules/Admin');
     const RoleID = role.id;
     const search = await Emojis.findOne({ where: { IDrole: RoleID } });
-    if (!search)
-        return;
-    await Emojis.destroy({ where: { IDrole: RoleID } });
+    const searchverifyrole = await Infos.findOne({ where: { DiscordID: RoleID } });
+
+    if (search)
+        await Emojis.destroy({ where: { IDrole: RoleID } });
+
+    if (searchverifyrole)
+        await Infos.update({ Valeur: false }, { where: { DiscordID: RoleID } });
+        await Infos.update({ DiscordID: null }, { where: { DiscordID: RoleID } });
+        await Admins.update({ Valeur: false }, { where: { Module: "verify" } });
 };

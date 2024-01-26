@@ -1,8 +1,30 @@
 //TODO:
 
-// 1. À sa création/fermeture, enregistrer le ticket dans la base de données (Utilisateur, Date, Type de ticket, Ouvert/Fermé, Lien du channel)
+// v0.0.1 À sa création/fermeture, enregistrer le ticket dans la base de données (Utilisateur, Date, Type de ticket, Ouvert/Fermé, Lien du channel)
+//OSEF en vrai
 
-// 2. Faire une commande qui permet d'ajouter ou de modifier les ID nécessaires dans une base de données(openticket, ticketchannel, archiveticket)
+// v0.1.0 Faire une commande qui permet d'ajouter ou de modifier les ID nécessaires dans une base de données(openticket, ticketchannel, archiveticket)
 //Objectif ne pas avoir à modifier le code pour changer les ID
+//DONE
 
-// 3. Faire une commande qui permet d'activer ou désactiver le sysème de Ticket/le système d'XP (True/False dans une base de données, et fetch dans le code)
+// v0.1.1 Faire une commande qui permet d'activer ou désactiver le sysème de Ticket/le système d'XP (True/False dans une base de données, et fetch dans le code)
+//DONE
+
+// v0.2.0 Faire une commande qui permet de configurer le channel de vérification et le rôle à donner
+//DONE
+
+// v0.2.1 Configurer le bouton de vérification
+//DONE
+
+// v0.3.0 Faire une commande qui permet supprimer une ligne dans la base de données du reactionrole et d'enlever la réaction du message
+//DONE
+
+// v0.3.1 Faire en sorte que les réactions sur les messages de la BDD reactionrole soit retirées lors des différents events qui destroy les lignes de la BDD
+
+// v0.4.0 Rajouter à la commande Setup le choix du channel de welcome et de leave + Fetch dans le code
+
+// ...
+
+// v0.?.0 Faire un vrai README.md et y mettre la TODO list
+
+// v1.0.0 Release de Khween

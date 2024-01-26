@@ -1,8 +1,12 @@
 const Level = require("../modules/xp")
+const Admins = require("../modules/Admin")
 
 module.exports = async (client, message, member) => {
 
     if (message.author.bot) return;
+    if (message.channel.type === "dm") return;
+    const adminInfos = await Admins.findOne({ where: { Module: "xp" } });
+    if (adminInfos.Valeur === false) return;
 
     const MembreID = message.author.id;
     const ServeurID = message.guild.id;
