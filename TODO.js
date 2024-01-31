@@ -19,9 +19,12 @@
 // v0.3.0 Faire une commande qui permet supprimer une ligne dans la base de données du reactionrole et d'enlever la réaction du message
 //DONE
 
-// v0.3.1 Faire en sorte que les réactions sur les messages de la BDD reactionrole soit retirées lors des différents events qui destroy les lignes de la BDD
+// v0.4.0 Faire un système de mise à jour automatique du bot
+//DONE
 
-// v0.4.0 Rajouter à la commande Setup le choix du channel de welcome et de leave + Fetch dans le code
+// v0.4.1 Faire en sorte que les réactions sur les messages de la BDD reactionrole soit retirées lors des différents events qui destroy les lignes de la BDD
+
+// v0.5.0 Rajouter à la commande Setup le choix du channel de welcome et de leave + Fetch dans le code
 
 // ...
 
