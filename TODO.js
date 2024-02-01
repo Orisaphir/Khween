@@ -26,6 +26,10 @@
 
 // v0.5.0 Rajouter à la commande Setup le choix du channel de welcome et de leave + Fetch dans le code
 
+// v0.6.0 Faire une commande /embed
+
+// v0.6.1 Pour la commande /rr, faire en sorte que l'utilisateur puisse indiquer le lien du message et que le bot récupère l'id tout seul
+
 // ...
 
 // v0.?.0 Faire un vrai README.md et y mettre la TODO list

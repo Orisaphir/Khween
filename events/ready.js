@@ -47,6 +47,6 @@ module.exports = async client => {
         }
     );
 
-    console.log('Kween est prête !');
+    console.log('Khween est prête !');
     client.user.setActivity('modérer')
 }
