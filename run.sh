@@ -1,4 +1,4 @@
 #!/bin/bash
-chmod +x ./run.sh
-npm install
-node index.js
+sudo chmod +x ./run.sh
+sudo npm install
+sudo node index.js

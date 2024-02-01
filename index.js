@@ -201,6 +201,7 @@ async function update() {
     }
     catch (e) {
         put('Erreur: Impossible de supprimer les fichiers, une réinstallation manuelle est nécessaire. Les fichiers tels que les bases de données et le fichier config.json ont été sauvegardés dans le dossier TEMP.');
+        put(`\n\nErreur: ${e}\n`)
         quit(ErreurCode.CriticalError);
         return false;
     }
