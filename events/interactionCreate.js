@@ -2,17 +2,40 @@ const { InteractionType, PermissionFlagsBits, ChannelType, EmbedBuilder, ActionR
 const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
 const Admins = require('../modules/Admin')
 const Infos = require('../modules/Infos');
+const Ori = `<@421416465430741003>`
+
+async function getdate() {
+	let date = new Date();
+	let jour = date.getDate();
+	if (jour < 10) {
+		jour = "0" + jour;
+	}
+	let mois = date.getMonth() + 1;
+	if (mois < 10) {
+		mois = "0" + mois;
+	}
+	let annee = date.getFullYear();
+	let heure = date.getHours();
+	if (heure < 10) {
+		heure = "0" + heure;
+	}
+	let minute = date.getMinutes();
+	if (minute < 10) {
+		minute = "0" + minute;
+	}
+	let dateheure = jour + "-" + mois + "-" + annee + "-" + heure + "h" + minute;
+	return dateheure;
+}
+
+function put(text){
+	console.log(text);
+
+}
 
 module.exports = async (client, inter) => {
 
 	if (inter.isButton()) {
-		const date = new Date();
-		const jour = date.getDate();
-		const mois = date.getMonth() + 1;
-		const annee = date.getFullYear();
-		const heure = date.getHours();
-		const minute = date.getMinutes();
-		const dateheure = jour + "/" + mois + "/" + annee + " " + heure + ":" + minute;
+		const dateheure = await getdate();
 		const adminInfos = await Admins.findOne({ where: { Module: "ticket" } });
 		const ticketchannelInfos = await Infos.findOne({ where: { Infos: "ticketchannel" } });
 		const ticketchannel = ticketchannelInfos.DiscordID;
@@ -37,19 +60,129 @@ module.exports = async (client, inter) => {
 					return inter.reply({ content: "Le salon des Tickets archivés n'existe plus ou est introuvable. Merci de le reconfigurer avec la commande /config !", ephemeral: true });
 				}
 			} catch (err) {
-				console.log(err);
-				return inter.reply({ content: "Une erreur est survenue à la fermeture du Ticket. Merci de contacter @Orisaphir au plus vite.", ephemeral: true });
+				put(`\n\nErreur lors de la vérification des salons Ticket.\n\nErreur:\n\n${err}`);
+				return inter.reply({ content: `Une erreur est survenue à la fermeture du Ticket. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
 			}
 
 			const channel = inter.channel;
-			await channel.setParent(archiveticket);
-			await channel.permissionOverwrites.edit(inter.user.id, { PermissionFlagsBits: 0 });
+			const parentChannel = inter.guild.channels.cache.get(archiveticket);
+			let TicketUser = ''
+			try {
+				let Username = channel.name.split("-")[2];
+				let FetchUser = await inter.guild.members.fetch({ query: Username, limit: 1 });
+				TicketUser = await FetchUser.first();
+			} catch (err) {
+				put(`\n\nErreur lors de la récupération du nom de l'utilisateur qui a créé le ticket.\n\nErreur:\n\n${err}`);
+				return inter.reply({ content: `Une erreur est survenue à la fermeture du Ticket. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
+			}
+			try {
+				if (parentChannel && parentChannel.type === 4) {
+					let ticketName = channel.name;
+					const children = parentChannel.children.cache.map(channel => channel);
+					const archiveChannels = children.filter(channel => channel.type === 0 && channel.name.startsWith("🚩-ticket-") || channel.name.startsWith("🐞-ticket-") || channel.name.startsWith("🛎️-ticket-") || channel.name.startsWith("🎫-ticket-")).sort((a, b) => a.name.localeCompare(b.name));
+					const index = archiveChannels.findIndex(channel => channel.name.localeCompare(ticketName) > 0);
+					const newPosition = index !== -1 ? archiveChannels[index].position : archiveChannels.length;
+					await channel.setParent(archiveticket);
+					await channel.setPosition(newPosition);
+				}
+			} catch (err) {
+				put(`\n\nErreur lors du tri et de l'archivage du Ticket.\n\nErreur:\n\n${err}`);
+				return inter.reply({ content: `Une erreur est survenue à la fermeture du Ticket. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
+			}
+			try {
+				await channel.permissionOverwrites.set([
+					{
+						id: TicketUser.user.id,
+						deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.AddReactions],
+						allow: [PermissionFlagsBits.ViewChannel]
+					},
+					{
+						id: inter.guild.roles.everyone,
+						deny: [PermissionFlagsBits.ViewChannel]
+					}
+				])
+			} catch (err) {
+				put(`Erreur lors de la modification des permissions du Ticket.\n\n Erreur: ${err}`);
+				channel.send({ content: `Une erreur est survenue à la fermeture du Ticket. Une vérification dans la console est nécessaire. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
+			}
 			await inter.message.edit({ components: [] });
 			const embed = new EmbedBuilder()
-				.setTitle("Ticket de " + inter.user.username)
-				.setColor("#ff0000")
-				.setFooter({ text: "Ticket fermé" });
-			await inter.reply({ embeds: [embed] });
+				.setTitle("Ticket fermé par " + inter.user.globalName)
+				.setColor("#ff0000");
+			const row = new ActionRowBuilder().setComponents(
+				new ButtonBuilder().setCustomId("reopen").setLabel("Réouvrir le ticket").setStyle(ButtonStyle.Success).setEmoji('🔓'),
+			);
+			await channel.send({ 
+				embeds: ([embed]),
+				components: [
+					row
+				]
+			});
+		}
+		if (inter.customId === "reopen") {
+			if (ticketchannelInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer la Catégorie où seront envoyés les Tickets avec la commande /config", ephemeral: true });
+			try {
+				const CheckOpenTicketChannel = await inter.guild.channels.cache.get(openticket);
+				if (!CheckOpenTicketChannel) {
+					await inter.channel.send("⚠️Le salon du support Ticket n'existe plus ou est introuvable. Merci de le reconfigurer avec la commande /config !⚠️");
+				}
+				const CheckTicketCategory = await inter.guild.channels.cache.get(ticketchannel);
+				if (!CheckTicketCategory) {
+					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel" } });
+					return inter.reply({ content: "La catégorie des Tickets n'existe plus ou est introuvable. Merci de la reconfigurer avec la commande /config !", ephemeral: true });
+				}
+			} catch (err) {
+				put(`\n\nErreur lors de la vérification des salons Ticket.\n\nErreur:\n\n${err}`);
+				return inter.channel.send({ content: `Une erreur est survenue à la réouverture du Ticket. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
+			}
+			const channel = inter.channel;
+			const parentChannel = inter.guild.channels.cache.get(ticketchannel);
+			let TicketUser = ''
+			try {
+				let Username = channel.name.split("-")[2];
+				let FetchUser = await inter.guild.members.fetch({ query: Username, limit: 1 });
+				TicketUser = await FetchUser.first();
+			} catch (err) {
+				put(`\n\nErreur lors de la récupération du nom de l'utilisateur à qui appartient le ticket.\n\nErreur:\n\n${err}`);
+				return inter.reply({ content: `Une erreur est survenue à la réouverture du Ticket. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
+			}
+			try {
+				if (parentChannel && parentChannel.type === 4) {
+					await channel.setParent(ticketchannel);
+				}
+			} catch (err) {
+				put(`\n\nErreur lors de la réouverture du Ticket.\n\nErreur:\n\n${err}`);
+				return inter.reply({ content: `Une erreur est survenue à la réouverture du Ticket. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
+			}
+			try {
+				await channel.permissionOverwrites.set([
+					{
+						id: TicketUser.user.id,
+						allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+					},
+					{
+						id: inter.guild.roles.everyone,
+						deny: [PermissionFlagsBits.ViewChannel]
+					}
+				])
+			} catch (err) {
+				put(`Erreur lors de la modification des permissions du Ticket.\n\n Erreur: ${err}`);
+				channel.send({ content: `Une erreur est survenue à la réouverture du Ticket. Une vérification dans la console est nécessaire. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
+			}
+
+			const embed = new EmbedBuilder()
+				.setTitle("Ticket réouvert par " + inter.user.globalName)
+				.setColor("#ff0000");
+			const row = new ActionRowBuilder().setComponents(
+				new ButtonBuilder().setCustomId("close").setLabel("Fermer le ticket").setStyle(ButtonStyle.Success).setEmoji('🔒'),
+			);
+			await inter.message.edit({ 
+				embeds: ([embed]),
+				components: [
+					row
+				] 
+			});
+			inter.reply({ content: "Le ticket a bien été réouvert", ephemeral: true });
 		}
 		if (inter.customId === "member") {
 
@@ -63,7 +196,7 @@ module.exports = async (client, inter) => {
 				}
 			} catch (err) {
 				console.log(err);
-				return inter.reply({ content: "Une erreur est survenue à la création du Ticket pour Signaler un membre. Merci de contacter @Orisaphir au plus vite.", ephemeral: true });
+				return inter.reply({ content: `Une erreur est survenue à la création du Ticket pour Signaler un membre. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
 			}
 
 			const channel = await inter.channel.guild.channels.create({
@@ -83,7 +216,7 @@ module.exports = async (client, inter) => {
 			});
 			
 			const embed = new EmbedBuilder()
-				.setTitle("Ticket de " + inter.user.username)
+				.setTitle("Ticket de " + inter.user.globalName)
 				.setDescription("Signaler un membre")
 				.setColor("#ff0000")
 				.setFooter({ text: "Ticket ouvert" });
@@ -113,7 +246,7 @@ module.exports = async (client, inter) => {
 				}
 			} catch (err) {
 				console.log(err);
-				return inter.reply({ content: "Une erreur est survenue à la création du Ticket pour Signaler un bug. Merci de contacter @Orisaphir au plus vite.", ephemeral: true });
+				return inter.reply({ content: `Une erreur est survenue à la création du Ticket pour Signaler un bug. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
 			}
 
 			const channel = await inter.channel.guild.channels.create({
@@ -133,7 +266,7 @@ module.exports = async (client, inter) => {
 			});
 
 			const embed = new EmbedBuilder()
-				.setTitle("Ticket de " + inter.user.username)
+				.setTitle("Ticket de " + inter.user.globalName)
 				.setDescription("Signaler un bug")
 				.setColor("#ff0000")
 				.setFooter({ text: "Ticket ouvert" });
@@ -163,7 +296,7 @@ module.exports = async (client, inter) => {
 				}
 			} catch (err) {
 				console.log(err);
-				return inter.reply({ content: "Une erreur est survenue à la création du Ticket pour Problème serveur. Merci de contacter @Orisaphir au plus vite.", ephemeral: true });
+				return inter.reply({ content: `Une erreur est survenue à la création du Ticket pour Problème serveur. Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
 			}
 
 			const channel = await inter.channel.guild.channels.create({
@@ -183,7 +316,7 @@ module.exports = async (client, inter) => {
 			});
 
 			const embed = new EmbedBuilder()
-				.setTitle("Ticket de " + inter.user.username)
+				.setTitle("Ticket de " + inter.user.globalName)
 				.setDescription("Problème serveur")
 				.setColor("#ff0000")
 				.setFooter({ text: "Ticket ouvert" });
@@ -213,7 +346,7 @@ module.exports = async (client, inter) => {
 				}
 			} catch (err) {
 				console.log(err);
-				return inter.reply({ content: "Une erreur est survenue à la création du Ticket pour Besoin de support (autre). Merci de contacter @Orisaphir au plus vite.", ephemeral: true });
+				return inter.reply({ content: `Une erreur est survenue à la création du Ticket pour Besoin de support (autre). Merci de contacter ${Ori} au plus vite.`, ephemeral: true });
 			}
 
 			const channel = await inter.channel.guild.channels.create({
@@ -233,7 +366,7 @@ module.exports = async (client, inter) => {
 			});
 
 			const embed = new EmbedBuilder()
-				.setTitle("Ticket de " + inter.user.username)
+				.setTitle("Ticket de " + inter.user.globalName)
 				.setDescription("Besoin de support (autre)")
 				.setColor("#ff0000")
 				.setFooter({ text: "Ticket ouvert" });
@@ -271,7 +404,7 @@ module.exports = async (client, inter) => {
 				});
 
 				const embed = new EmbedBuilder()
-					.setTitle("Ticket de " + inter.user.username)
+					.setTitle("Ticket de " + inter.user.globalName)
 					.setDescription("Problème de vérication (Rôle introuvable)")
 					.setColor("#ff0000")
 					.setFooter({ text: "Ticket ouvert" });
@@ -306,7 +439,7 @@ module.exports = async (client, inter) => {
 				});
 
 				const embed = new EmbedBuilder()
-					.setTitle("Ticket de " + inter.user.username)
+					.setTitle("Ticket de " + inter.user.globalName)
 					.setDescription("Problème de vérication (Module désactivé)")
 					.setColor("#ff0000")
 					.setFooter({ text: "Ticket ouvert" });
