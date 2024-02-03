@@ -12,7 +12,7 @@ module.exports = {
                 .setName('type')
                 .setDescription('Type de configuration')
                 .setRequired(true)
-                .addChoices({ name: 'Channel pour demander un Ticket', value: 'openticketID' }, { name: 'Catégorie pour les Tickets', value: 'ticketchannelID' }, { name: 'Catégorie pour les Tickets archivés', value: 'archiveticketID' })
+                .addChoices({ name: 'Channel pour demander un Ticket', value: 'openticketID' }, { name: 'Catégorie pour les Tickets', value: 'ticketchannelID' }, { name: 'Catégorie pour les Tickets archivés', value: 'archiveticketID' }, { name: 'Salon pour les logs', value: 'logsID' })
         )
         .addStringOption((options) => options.setName("id").setDescription('ID du channel ou de la catégorie').setRequired(true)),
 
@@ -27,20 +27,22 @@ module.exports = {
             if (Type === "openticketID") {
                 if (checkID.type !== 0) return message.reply({ content: "L'ID indiqué n'est pas un salon !", ephemeral: true });
                 await Infos.update({ DiscordID: ID, Valeur: true }, { where: { Infos: "openticket" } });
-            } else {
-                if (Type === "ticketchannelID") {
-                    if (checkID.type !== 4) return message.reply({ content: "L'ID indiqué n'est pas une catégorie !", ephemeral: true });
-                    await Infos.update({ DiscordID: ID, Valeur: true }, { where: { Infos: "ticketchannel" } });
-                } else {
-                    if (Type === "archiveticketID") {
-                        if (checkID.type !== 4) return message.reply({ content: "L'ID indiqué n'est pas une catégorie !", ephemeral: true });
-                        await Infos.update({ DiscordID: ID, Valeur: true }, { where: { Infos: "archiveticket" } });
-                    }
-                }
+            }
+            if (Type === "ticketchannelID") {
+                if (checkID.type !== 4) return message.reply({ content: "L'ID indiqué n'est pas une catégorie !", ephemeral: true });
+                await Infos.update({ DiscordID: ID, Valeur: true }, { where: { Infos: "ticketchannel" } });
+            }
+            if (Type === "archiveticketID") {
+                if (checkID.type !== 4) return message.reply({ content: "L'ID indiqué n'est pas une catégorie !", ephemeral: true });
+                await Infos.update({ DiscordID: ID, Valeur: true }, { where: { Infos: "archiveticket" } });
+            }
+            if (Type === "logsID") {
+                if (checkID.type !== 0) return message.reply({ content: "L'ID indiqué n'est pas un salon !", ephemeral: true });
+                await Infos.update({ DiscordID: ID, Valeur: true }, { where: { Infos: "logs" } });
             }
             await message.reply({ content: "La configuration a bien été enregistrée", ephemeral: true });
         } catch (err) {
-            message.reply({ content: "Une erreur est survenue", ephemeral: true });
+            message.reply({ content: `Une erreur est survenue. Merci de contacter ${Ori} au plus vite`, ephemeral: true });
             console.log(err);
         }
     }

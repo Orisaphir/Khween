@@ -17,9 +17,15 @@ module.exports = async client => {
         await Admins.bulkCreate([
             { Module: 'ticket', Valeur: false },
             { Module: 'xp', Valeur: false },
-            { Module: 'verify', Valeur: false} 
+            { Module: 'verify', Valeur: false},
+            { Module: 'logs', Valeur: false}
         ]);
     }
+    await Admins.findOrCreate({ where: { Module: 'ticket' }, defaults: { Valeur: false } });
+    await Admins.findOrCreate({ where: { Module: 'xp' }, defaults: { Valeur: false } });
+    await Admins.findOrCreate({ where: { Module: 'verify' }, defaults: { Valeur: false } });
+    await Admins.findOrCreate({ where: { Module: 'logs' }, defaults: { Valeur: false } });
+    
 
     const Infos = require("../modules/Infos")
     await Infos.sync()
@@ -30,9 +36,17 @@ module.exports = async client => {
             { Infos: 'ticketchannel', Valeur: false },
             { Infos: 'archiveticket', Valeur: false },
             { Infos: 'verifychannel', Valeur: false },
-            { Infos: 'verifyrole', Valeur: false }
+            { Infos: 'verifyrole', Valeur: false },
+            { Infos: 'logs', Valeur: false}
         ]);
     }
+    await Infos.findOrCreate({ where: { Infos: 'openticket' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'ticketchannel' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'archiveticket' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'verifychannel' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'verifyrole' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'logs' }, defaults: { Valeur: false } });
+    
 
     const reactions = await Emojis.findAll();
 
