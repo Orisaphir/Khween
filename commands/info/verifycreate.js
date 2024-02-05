@@ -8,10 +8,21 @@ module.exports = {
         .setName('verifycreate')
         .setDescription("Créer le message de vérification")
         .setDMPermission(false)
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .addIntegerOption((options) => 
+            options
+                .setName("force")
+                .setDescription("Forcer l'envoi du message de vérification")
+                .setRequired(true)
+                .addChoices({ name: 'True', value: 1 }, { name: 'False', value: 0 })
+        ),
 
     async run(client, inter) {
 
+        const GetForce = inter.options.getInteger("force");
+        let force = false;
+        if (GetForce === 1)
+            force = true;
         const verifychannelInfos = await Infos.findOne({ where: { Infos: "verifychannel" } });
         const verifyroleInfos = await Infos.findOne({ where: { Infos: "verifyrole" } });
         const adminInfos = await Admins.findOne({ where: { Module: "verify" } });
@@ -41,8 +52,10 @@ module.exports = {
             console.log(err);
             return inter.reply({ content: "Une erreur est survenue à la création du message de vérification. Merci de contacter @Orisaphir au plus vite.", ephemeral: true });
         }
-        const CheckMessage = await inter.guild.channels.cache.get(verifychannel).messages.fetch({ limit: 1 });
-        if (CheckMessage.size !== 0) return inter.reply({ content: "Le message de vérification est déjà envoyé (le salon ne doit comporter aucun message)", ephemeral: true });
+        if (force === false) {
+            const CheckMessage = await inter.guild.channels.cache.get(verifychannel).messages.fetch({ limit: 1 });
+            if (CheckMessage.size !== 0) return inter.reply({ content: "Le message de vérification est déjà envoyé (le salon ne doit comporter aucun message)", ephemeral: true });
+        }
 
         const { guild } = inter
 
