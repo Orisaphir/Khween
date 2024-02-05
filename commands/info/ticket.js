@@ -13,7 +13,7 @@ module.exports = {
             options
                 .setName("force")
                 .setDescription("Forcer l'envoi du message de support Ticket")
-                .setRequired(true)
+                .setRequired(false)
                 .addChoices({ name: 'True', value: 1 }, { name: 'False', value: 0 })
         ),
 
