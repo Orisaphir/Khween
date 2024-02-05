@@ -8,9 +8,22 @@ module.exports = {
         .setName('ticket')
         .setDescription('Créer le support ticket')
         .setDMPermission(false)
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+        .addIntegerOption((options) => 
+            options
+                .setName("force")
+                .setDescription("Forcer l'envoi du message de support Ticket")
+                .setRequired(true)
+                .addChoices({ name: 'True', value: 1 }, { name: 'False', value: 0 })
+        ),
 
     async run(client, inter) {
+
+        const GetForce = inter.options.getInteger("force");
+        let force = false;
+        if (GetForce === 1)
+            force = true;
+
         const openticketInfos = await Infos.findOne({ where: { Infos: "openticket" } });
         const adminInfos = await Admins.findOne({ where: { Module: "ticket" } });
         if (openticketInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer le Channel où sera envoyé le Ticket avec la commande /config", ephemeral: true });
@@ -28,8 +41,11 @@ module.exports = {
             console.log(err);
             return inter.reply({ content: "Une erreur est survenue à la création du support Ticket. Merci de contacter @Orisaphir au plus vite.", ephemeral: true });
         }
-        const CheckMessage = await inter.guild.channels.cache.get(openticket).messages.fetch({ limit: 1 });
-        if (CheckMessage.size !== 0) return inter.reply({ content: "Le message du support Ticket est déjà envoyé (le salon ne doit comporter aucun message)", ephemeral: true });
+        if (force === false) {
+            const CheckMessage = await inter.guild.channels.cache.get(openticket).messages.fetch({ limit: 1 });
+            if (CheckMessage.size !== 0) return inter.reply({ content: "Le message du support Ticket est déjà envoyé (le salon ne doit comporter aucun message)", ephemeral: true });
+        }
+        
 
         const { guild } = inter
 
