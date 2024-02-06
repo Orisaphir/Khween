@@ -72,6 +72,10 @@ module.exports = async (client, oldState, newState) => {
         }
     } catch (err) {
         try {
+            AdminCheck.update({ Valeur: false }, { where: { Module: 'logs' } });
+            if(orisaphir === null || orisaphir === undefined) {
+                return console.log(`Erreur : ${err}`);
+            }
             const embed = new EmbedBuilder()
                 .setTitle('Erreur')
                 .setDescription(`Erreur lors de l'exécution du fichier voiceStateUpdate.js\n\n\`\`\`js\n${err}\n\`\`\``)

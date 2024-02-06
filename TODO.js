@@ -26,11 +26,15 @@
 
 // v0.5.0 Rajouter à la commande Setup le choix du channel de welcome et de leave + Fetch dans le code
 
+// v0.5.1 Rajouter une commande Reward qui permet d'ajouter dans une bdd des rôles à donner à un certain niveau (ID du rôle, niveau, serveur)
+
 // v0.6.0 Faire une commande /embed
 
 // v0.6.1 Pour la commande /rr, faire en sorte que l'utilisateur puisse indiquer le lien du message et que le bot récupère l'id tout seul
 
 // ...
+
+// v0.?.0 Faire une commande ErreurDM qui permet de choisir l'id de la personne à qui envoyer les erreurs en DM (Ori par défaut)
 
 // v0.?.0 Faire un vrai README.md et y mettre la TODO list
 
