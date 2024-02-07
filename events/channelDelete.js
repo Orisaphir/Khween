@@ -1,6 +1,5 @@
 module.exports = async (client, channel) => {
     const Infos = require('../modules/Infos');
-    const Admins = require('../modules/Admin');
     const Emojis = require('../modules/Emojis');
 
     const channelID = channel.id;

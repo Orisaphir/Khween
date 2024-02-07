@@ -18,13 +18,17 @@ module.exports = async client => {
             { Module: 'ticket', Valeur: false },
             { Module: 'xp', Valeur: false },
             { Module: 'verify', Valeur: false},
-            { Module: 'logs', Valeur: false}
+            { Module: 'logs', Valeur: false},
+            { Module: 'WelcomeLeave', Valeur: false},
+            { Module: 'stats', Valeur: false}
         ]);
     }
     await Admins.findOrCreate({ where: { Module: 'ticket' }, defaults: { Valeur: false } });
     await Admins.findOrCreate({ where: { Module: 'xp' }, defaults: { Valeur: false } });
     await Admins.findOrCreate({ where: { Module: 'verify' }, defaults: { Valeur: false } });
     await Admins.findOrCreate({ where: { Module: 'logs' }, defaults: { Valeur: false } });
+    await Admins.findOrCreate({ where: { Module: 'WelcomeLeave' }, defaults: { Valeur: false } });
+    await Admins.findOrCreate({ where: { Module: 'stats' }, defaults: { Valeur: false } });
     
 
     const Infos = require("../modules/Infos")
@@ -37,7 +41,10 @@ module.exports = async client => {
             { Infos: 'archiveticket', Valeur: false },
             { Infos: 'verifychannel', Valeur: false },
             { Infos: 'verifyrole', Valeur: false },
-            { Infos: 'logs', Valeur: false}
+            { Infos: 'logs', Valeur: false},
+            { Infos: 'WelcomeLeave', Valeur: false},
+            { Infos: 'statsmembers', Valeur: false},
+            { Infos: 'statsbots', Valeur: false}
         ]);
     }
     await Infos.findOrCreate({ where: { Infos: 'openticket' }, defaults: { Valeur: false } });
@@ -46,6 +53,9 @@ module.exports = async client => {
     await Infos.findOrCreate({ where: { Infos: 'verifychannel' }, defaults: { Valeur: false } });
     await Infos.findOrCreate({ where: { Infos: 'verifyrole' }, defaults: { Valeur: false } });
     await Infos.findOrCreate({ where: { Infos: 'logs' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'WelcomeLeave' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'statsmembers' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'statsbots' }, defaults: { Valeur: false } });
     
 
     const reactions = await Emojis.findAll();

@@ -14,7 +14,7 @@ module.exports = {
                 .setName("type")
                 .setDescription("Type de configuration")
                 .setRequired(true)
-                .addChoices({ name: 'ticket', value: 'ticket' }, { name: 'xp', value: 'xp' }, { name: 'vérification', value: 'verify' }, { name: 'logs', value: 'logs' })
+                .addChoices({ name: 'ticket', value: 'ticket' }, { name: 'xp', value: 'xp' }, { name: 'vérification', value: 'verify' }, { name: 'logs', value: 'logs' }, { name: 'arrivées et départs', value: 'WelcomeLeave' }, { name: 'stats serveur', value: 'stats' })
         )
         .addIntegerOption((options) =>
             options
@@ -32,6 +32,11 @@ module.exports = {
         const checkVerify = await Admins.findOne({ where: { Module: "verify" } });
         const checkLogs = await Admins.findOne({ where: { Module: "logs" } });
         const checkLogsConfig = await Infos.findOne({ where: { Infos: "logs" } });
+        const checkWelcomeLeave = await Admins.findOne({ where: { Module: "WelcomeLeave" } });
+        const checkWelcomeLeaveConfig = await Infos.findOne({ where: { Infos: "WelcomeLeave" } });
+        const checkStats = await Admins.findOne({ where: { Module: "stats" } });
+        const checkStatsMembersConfig = await Infos.findOne({ where: { Infos: "statsmembers" } });
+        const checkStatsBotsConfig = await Infos.findOne({ where: { Infos: "statsbots" } });
         try {
             if (ModuleType === "ticket") {
                 if (ModuleValue.value === 1) {
@@ -68,6 +73,26 @@ module.exports = {
                 } else {
                     if (checkLogs.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
                     await Admins.update({ Valeur: false }, { where: { Module: "logs" } });
+                }
+            }
+            if (ModuleType === "WelcomeLeave") {
+                if (checkWelcomeLeaveConfig.Valeur === false) return message.reply({ content: "Le module d'arrivées et départs n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
+                if (ModuleValue.value === 1) {
+                    if (checkWelcomeLeave.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                    await Admins.update({ Valeur: true }, { where: { Module: "WelcomeLeave" } });
+                } else {
+                    if (checkWelcomeLeave.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                    await Admins.update({ Valeur: false }, { where: { Module: "WelcomeLeave" } });
+                }
+            }
+            if (ModuleType === "stats") {
+                if (checkStatsMembersConfig.Valeur === false && checkStatsBotsConfig.Valeur === false) return message.reply({ content: "Le module de stats n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
+                if (ModuleValue.value === 1) {
+                    if (checkStats.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                    await Admins.update({ Valeur: true }, { where: { Module: "stats" } });
+                } else {
+                    if (checkStats.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                    await Admins.update({ Valeur: false }, { where: { Module: "stats" } });
                 }
             }
             await message.reply({ content: "La configuration a bien été enregistrée", ephemeral: true });
