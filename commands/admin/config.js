@@ -12,7 +12,7 @@ module.exports = {
                 .setName('type')
                 .setDescription('Type de configuration')
                 .setRequired(true)
-                .addChoices({ name: 'Channel pour demander un Ticket', value: 'openticketID' }, { name: 'Catégorie pour les Tickets', value: 'ticketchannelID' }, { name: 'Catégorie pour les Tickets archivés', value: 'archiveticketID' }, { name: 'Channel pour les logs', value: 'logsID' }, { name: 'Channel pour les arrivées et départs', value: 'WelcomeLeaveID' }, { name: 'Channel Vocal pour les Stats Serveur des Membres', value: 'statsmemberID' }, { name: 'Channel Vocal pour les Stats Serveur des Bots', value: 'statsbotsID' })
+                .addChoices({ name: 'Channel pour demander un Ticket', value: 'openticketID' }, { name: 'Catégorie pour les Tickets', value: 'ticketchannelID' }, { name: 'Catégorie pour les Tickets archivés', value: 'archiveticketID' }, { name: 'Channel pour les logs', value: 'logsID' }, { name: 'Channel pour les arrivées et départs', value: 'WelcomeLeaveID' }, { name: 'Channel Vocal pour les Stats Serveur des Membres', value: 'statsmemberID' }, { name: 'Channel Vocal pour les Stats Serveur des Bots', value: 'statsbotsID' }, { name: 'Channel pour le level up', value: 'levelupID' })
         )
         .addStringOption((options) => options.setName("id").setDescription('ID du channel ou de la catégorie').setRequired(true)),
 
@@ -51,6 +51,10 @@ module.exports = {
             if (Type === "statsbotsID") {
                 if (checkID.type !== 2) return message.reply({ content: "L'ID indiqué n'est pas un salon vocal !", ephemeral: true });
                 await Infos.update({ DiscordID: ID, Valeur: true }, { where: { Infos: "statsbots" } });
+            }
+            if (Type === "levelupID") {
+                if (checkID.type !== 0) return message.reply({ content: "L'ID indiqué n'est pas un salon !", ephemeral: true });
+                await Infos.update({ DiscordID: ID, Valeur: true }, { where: { Infos: "levelup" } });
             }
             await message.reply({ content: "La configuration a bien été enregistrée", ephemeral: true });
         } catch (err) {

@@ -44,7 +44,8 @@ module.exports = async client => {
             { Infos: 'logs', Valeur: false},
             { Infos: 'WelcomeLeave', Valeur: false},
             { Infos: 'statsmembers', Valeur: false},
-            { Infos: 'statsbots', Valeur: false}
+            { Infos: 'statsbots', Valeur: false},
+            { Infos: 'levelup', Valeur: false}
         ]);
     }
     await Infos.findOrCreate({ where: { Infos: 'openticket' }, defaults: { Valeur: false } });
@@ -56,6 +57,7 @@ module.exports = async client => {
     await Infos.findOrCreate({ where: { Infos: 'WelcomeLeave' }, defaults: { Valeur: false } });
     await Infos.findOrCreate({ where: { Infos: 'statsmembers' }, defaults: { Valeur: false } });
     await Infos.findOrCreate({ where: { Infos: 'statsbots' }, defaults: { Valeur: false } });
+    await Infos.findOrCreate({ where: { Infos: 'levelup' }, defaults: { Valeur: false } });
     
 
     const reactions = await Emojis.findAll();
