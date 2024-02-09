@@ -2,6 +2,7 @@ const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
 const Canvas = require("@napi-rs/canvas")
 const Admins = require("../modules/Admin")
 const Infos = require("../modules/Infos")
+const Msg = require("../modules/Msg")
 const Level = require("../modules/xp")
 const Ori = `421416465430741003`
 
@@ -29,9 +30,56 @@ module.exports = async (client, member) => {
         if (checkWelcomeLeaveConfig.Valeur === false) return;
 
         const leaveChannel = member.guild.channels.cache.get(checkWelcomeLeaveConfig.DiscordID)
-        //TODO: Trouver un moyen de changer le message de départ via la base de données
-        const leaveMessage = `<@${member.id}> était vraiment perdu.e ..`
+        
+        let leaveTitle = "Au revoir !"
+
+        const leaveTitleConfig = await Msg.findOne({ where: { Infos: "LeaveTitle" } });
+        const title1 = leaveTitleConfig.Part1;
+        let title2 = leaveTitleConfig.Part2;
+        if (title2 === null) {
+            title2 = "";
+        }
+        if (title1 !== null) {
+            leaveTitle = `${title1} ${title2}`;
+        }
+
+        let leaveMessage = `Au revoir <@${member.id}> !`
+
+        const leaveMessageConfig = await Msg.findOne({ where: { Infos: "Leave" } });
+        const msg1 = leaveMessageConfig.Part1;
+        const Mention = leaveMessageConfig.Mention;
+        let msg2 = leaveMessageConfig.Part2;
+        if (msg2 === null) {
+            msg2 = "";
+        }
+        if (msg1 !== null) {
+            if (Mention === true) {
+                leaveMessage = `${msg1} <@${member.id}> ${msg2}`;
+            }
+            else {
+                leaveMessage = `${msg1} ${msg2}`;
+            }
+        }
+
         const memberCount = member.guild.members.cache.filter(user => !user.user.bot).size;
+
+        let leaveFooter = `Nous ne sommes plus que ${memberCount} membres !`
+
+        const leaveFooterConfig = await Msg.findOne({ where: { Infos: "LeaveFooter" } });
+        const footer1 = leaveFooterConfig.Part1;
+        const count = leaveFooterConfig.Mention;
+        let footer2 = leaveFooterConfig.Part2;
+        if (footer2 === null) {
+            footer2 = "";
+        }
+        if (footer1 !== null) {
+            if (count === true) {
+                leaveFooter = `${footer1} ${memberCount} ${footer2}`;
+            }
+            else {
+                leaveFooter = `${footer1} ${footer2}`;
+            }
+        }
 
         const canvas = Canvas.createCanvas(700, 250);
         const context = canvas.getContext('2d');
@@ -53,12 +101,11 @@ module.exports = async (client, member) => {
 
         const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'profil-image.png' });
 
-        //TODO: Trouver un moyen de changer le titre et le footer de l'embed via la base de données
         const leaveEmbed = new EmbedBuilder()
-            .setTitle("**EMERGENCY MEETING !**")
+            .setTitle(leaveTitle)
             .setDescription(leaveMessage)
             .setImage('attachment://profil-image.png')
-            .setFooter({ text: `Nous ne sommes plus que ${memberCount} énergumènes !` })
+            .setFooter({ text: leaveFooter })
             .setColor("Purple")
             .setTimestamp();
 

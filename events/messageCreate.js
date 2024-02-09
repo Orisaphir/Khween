@@ -2,6 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 const Ori = `421416465430741003`
 const Level = require("../modules/xp")
 const Admins = require("../modules/Admin")
+const Msg = require("../modules/Msg")
 const Infos = require("../modules/Infos")
 
 module.exports = async (client, message, member) => {
@@ -48,8 +49,42 @@ module.exports = async (client, message, member) => {
                 xp: 1,
                 level: 1,
             }
+            level = 1;
+            let levelmsg = `Félicitation ${message.author.username} ! Tu viens de passer niveau 1 !`
+
+            const levelmsgConfig = await Msg.findOne({ where: { Infos: "LevelUp" } });
+            const Part1 = levelmsgConfig.Part1;
+            const Mention = levelmsgConfig.Mention;
+            let Part2 = levelmsgConfig.Part2;
+            if (Part2 === null) {
+                Part2 = "";
+            }
+            const Niveau = levelmsgConfig.Niveau;
+            let Part3 = levelmsgConfig.Part3;
+            if (Part3 === null) {
+                Part3 = "";
+            }
+            if (Part1 !== null) {
+                if (Mention === true) {
+                    if (Niveau === true) {
+                        levelmsg = `${Part1} ${message.author.username} ${Part2} ${level} ${Part3}`;
+                    }
+                    else {
+                        levelmsg = `${Part1} ${message.author.username} ${Part2} ${Part3}`;
+                    }
+                }
+                else {
+                    if (Niveau === true) {
+                        levelmsg = `${Part1} ${Part2} ${level} ${Part3}`;
+                    }
+                    else {
+                        levelmsg = `${Part1} ${Part2} ${Part3}`;
+                    }
+                }
+            }
+
             Level.create(champs);
-            levelUp.send(`🎊 félicitations, ${message.author.username} ! le **_niveau 1_** est entre tes mains ! encore un effort et peut-être que tu obtiendras **_l'anneau unique_** 🎊`)
+            levelUp.send(levelmsg)
         } catch (err) {
             try {
                 adminInfos.update({ Valeur: false }, { where: { Module: "xp" } });
@@ -83,9 +118,43 @@ module.exports = async (client, message, member) => {
             xp = result
 
             if(xp >= xplevel){
+
+                let levelmsg = `Félicitation ${message.author.username} ! Tu viens de passer niveau ${resultLevel} !`
+
+                const levelmsgConfig = await Msg.findOne({ where: { Infos: "LevelUp" } });
+                const Part1 = levelmsgConfig.Part1;
+                const Mention = levelmsgConfig.Mention;
+                let Part2 = levelmsgConfig.Part2;
+                if (Part2 === null) {
+                    Part2 = "";
+                }
+                const Niveau = levelmsgConfig.Niveau;
+                let Part3 = levelmsgConfig.Part3;
+                if (Part3 === null) {
+                    Part3 = "";
+                }
+                if (Part1 !== null) {
+                    if (Mention === true) {
+                        if (Niveau === true) {
+                            levelmsg = `${Part1} ${message.author.username} ${Part2} ${resultLevel} ${Part3}`;
+                        }
+                        else {
+                            levelmsg = `${Part1} ${message.author.username} ${Part2} ${Part3}`;
+                        }
+                    }
+                    else {
+                        if (Niveau === true) {
+                            levelmsg = `${Part1} ${Part2} ${resultLevel} ${Part3}`;
+                        }
+                        else {
+                            levelmsg = `${Part1} ${Part2} ${Part3}`;
+                        }
+                    }
+                }
+
                 Level.update({ level: resultLevel }, { where: { IDMembre: MembreID} });
                 Level.update({ xp: 0 }, { where: { IDMembre: MembreID} });
-                levelUp.send(`🎊 félicitations, ${message.author.username} ! le **_niveau ${resultLevel}_** est entre tes mains ! encore un effort et peut-être que tu obtiendras **_l'anneau unique_** 🎊`)
+                levelUp.send(levelmsg)
             }
         } catch (err) {
             try {

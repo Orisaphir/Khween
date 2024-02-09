@@ -59,6 +59,43 @@ module.exports = async client => {
     await Infos.findOrCreate({ where: { Infos: 'statsbots' }, defaults: { Valeur: false } });
     await Infos.findOrCreate({ where: { Infos: 'levelup' }, defaults: { Valeur: false } });
     
+    const Msg = require("../modules/Msg")
+    await Msg.sync()
+    const count3 = await Msg.count();
+    if (count3 === 0) {
+        await Msg.bulkCreate([
+            { Infos: 'Welcome' },
+            { Infos: 'WelcomeTitle' },
+            { Infos: 'WelcomeFooter' },
+            { Infos: 'Leave' },
+            { Infos: 'LeaveTitle' },
+            { Infos: 'LeaveFooter' },
+            { Infos: 'Ticket'},
+            { Infos: 'Verify' },
+            { Infos: 'LevelUp' }
+        ]);
+    }
+    await Msg.findOrCreate({ where: { Infos: 'Welcome' } });
+    await Msg.findOrCreate({ where: { Infos: 'WelcomeTitle' } });
+    await Msg.findOrCreate({ where: { Infos: 'WelcomeFooter' } });
+    await Msg.findOrCreate({ where: { Infos: 'Leave' } });
+    await Msg.findOrCreate({ where: { Infos: 'LeaveTitle' } });
+    await Msg.findOrCreate({ where: { Infos: 'LeaveFooter' } });
+    await Msg.findOrCreate({ where: { Infos: 'Ticket' } });
+    await Msg.findOrCreate({ where: { Infos: 'Verify' } });
+    await Msg.findOrCreate({ where: { Infos: 'LevelUp' } });
+
+    const HistoData = require("../modules/HistoData")
+    await HistoData.sync();
+    const count4 = await HistoData.count();
+    if (count4 === 0) {
+        await HistoData.bulkCreate([
+            { Infos: 'Ticket' },
+            { Infos: 'Verify' },
+        ]);
+    }
+    await HistoData.findOrCreate({ where: { Infos: 'Ticket' } });
+    await HistoData.findOrCreate({ where: { Infos: 'Verify' } });
 
     const reactions = await Emojis.findAll();
 

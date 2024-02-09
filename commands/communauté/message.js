@@ -17,7 +17,11 @@ module.exports = {
         try {
 
             await message.reply({content: "Message envoyé !", ephemeral: true})
-            await channel.send(messageContent)
+            await channel.sendTyping();
+            setTimeout(async () => {
+                await channel.send(messageContent)
+            }, 5000);
+            
         } catch (err) {
 
             return message.reply({content: "Erreur lors de l'envoi du message", ephemeral: true})

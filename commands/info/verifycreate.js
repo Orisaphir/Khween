@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits } = require("discord.js");
 const Admins = require('../../modules/Admin')
 const Infos = require('../../modules/Infos');
+const Msg = require('../../modules/Msg');
+const HistoData = require('../../modules/HistoData');
 
 module.exports = {
     
@@ -26,9 +28,11 @@ module.exports = {
         const verifychannelInfos = await Infos.findOne({ where: { Infos: "verifychannel" } });
         const verifyroleInfos = await Infos.findOne({ where: { Infos: "verifyrole" } });
         const adminInfos = await Admins.findOne({ where: { Module: "verify" } });
+        const HistoVerify = await HistoData.findOne({ where: { Infos: "Verify" } });
         if (verifychannelInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer le Channel où sera envoyé le message de vérification avec la commande /verifyconfig", ephemeral: true });
         if (verifyroleInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer le Rôle qui sera donné avec la commande /verifyconfig", ephemeral: true });
         if (adminInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez l'activer avec la commande /setup", ephemeral: true });
+        if (HistoVerify.Message !== null) return inter.reply({ content: "Le message de vérification est déjà envoyé", ephemeral: true });
 
         const verifychannel = verifychannelInfos.DiscordID;
         const verifyrole = verifyroleInfos.DiscordID;
@@ -59,9 +63,19 @@ module.exports = {
 
         const { guild } = inter
 
+        let msgDesc = "Clique sur « vérifier » pour avoir accès au serveur !";
+
+        const data = await Msg.findOne({ where: { Infos: "Verify" } });
+        const Part1 = data.Part1;
+        let Part2 = data.Part2;
+        if (Part2 === null) Part2 = "";
+
+        if (Part1 !== null)
+            msgDesc = `${Part1} ${Part2}`;
+
         const embed = new EmbedBuilder()
             .setTitle("Vérification")
-            .setDescription("Clique sur « vérifier » si t'es pas un alien !")
+            .setDescription(msgDesc)
             .setColor("#00FF00")
         
         const button = new ActionRowBuilder().setComponents(
@@ -74,6 +88,10 @@ module.exports = {
                 button
             ]
         });
+        const messagesend = await guild.channels.cache.get(verifychannel).messages.fetch({ limit: 1 });
+        const messagesendID = messagesend.first().id;
+        await HistoVerify.update({ Channel: verifychannel, Message: messagesendID }, { where: { Infos: "Verify" } });
+
 
         inter.reply({content: "Le message de vérification a bien été envoyé", ephemeral: true});
     }

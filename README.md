@@ -1,4 +1,4 @@
-# Khween (Debug Version)
- Test des nouvelles implémentations de Khween avant l'ajout sur sa version stable.
+# Khween
+ Le programme Khween est un bot Discord. Un système de mise à jour automatique est inclu dans le programme pour que vous ayez les dernière fonctionnalitées en temps réel.
 
- Actuellement en Alpha.
+ Le programme Khween est actuellement en Bêta.

@@ -25,9 +25,12 @@
 // v0.5.0 Rajouter à la commande Setup le choix du channel de welcome et de leave + Les GuildsStats + Fetch dans le code
 //DONE
 
-// v0.5.1 Rajouter une commande Reward qui permet d'ajouter dans une bdd des rôles à donner à un certain niveau (ID du rôle, niveau, serveur)
+// v0.5.1 Rajouter un historique de module pour Ticket/Verify et une commande qui permet de modifier les messages des différentes commandes + Fetch dans le code
+//DONE
 
-// v0.5.2 Faire en sorte que les réactions sur les messages de la BDD reactionrole soit retirées lors des différents events qui destroy les lignes de la BDD
+// v0.5.2 Rajouter une commande Reward qui permet d'ajouter dans une bdd des rôles à donner à un certain niveau (ID du rôle, niveau, serveur)
+
+// v0.5.3 Faire en sorte que les réactions sur les messages de la BDD reactionrole soit retirées lors des différents events qui destroy les lignes de la BDD
 
 // v0.6.0 Faire une commande /embed
 

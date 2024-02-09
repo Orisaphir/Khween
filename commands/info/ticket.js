@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits } = require("discord.js");
 const Admins = require('../../modules/Admin')
 const Infos = require('../../modules/Infos');
+const Msg = require('../../modules/Msg');
+const HistoData = require('../../modules/HistoData');
 
 module.exports = {
 
@@ -26,8 +28,10 @@ module.exports = {
 
         const openticketInfos = await Infos.findOne({ where: { Infos: "openticket" } });
         const adminInfos = await Admins.findOne({ where: { Module: "ticket" } });
+        const HistoTicket = await HistoData.findOne({ where: { Infos: "Ticket" } });
         if (openticketInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer le Channel où sera envoyé le Ticket avec la commande /config", ephemeral: true });
         if (adminInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez l'activer avec la commande /setup", ephemeral: true });
+        if (HistoTicket.Message !== null) return inter.reply({ content: "Le support Ticket est déjà créé", ephemeral: true });
 
         const openticket = openticketInfos.DiscordID;
         try {
@@ -49,8 +53,18 @@ module.exports = {
 
         const { guild } = inter
 
+        let msgDesc = "Ouvrir un ticket support";
+
+        const data = await Msg.findOne({ where: { Infos: "Ticket" } });
+        const Part1 = data.Part1;
+        let Part2 = data.Part2;
+        if (Part2 === null) Part2 = "";
+
+        if (Part1 !== null)
+            msgDesc = `${Part1} ${Part2}`;
+
         const embed = new EmbedBuilder()
-            .setDescription("Ouvrir un ticket support")
+            .setDescription(msgDesc)
 
         const button = new ActionRowBuilder().setComponents(
             new ButtonBuilder().setCustomId("member").setLabel("Signaler un membre").setStyle(ButtonStyle.Danger).setEmoji('🚩'),
@@ -65,6 +79,10 @@ module.exports = {
                 button
             ]
         });
+
+        const messagesend = await guild.channels.cache.get(openticket).messages.fetch({ limit: 1 });
+        const messagesendID = messagesend.first().id;
+        await HistoTicket.update({ Channel: openticket, Message: messagesendID }, { where: { Infos: "Ticket" } });
 
         inter.reply({content: "Le ticket a bien été envoyé", ephemeral: true});
     }
