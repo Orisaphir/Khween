@@ -44,6 +44,10 @@ module.exports = {
             return;
         };
         const roleID = message.options.getRole("rôle").id
+        if (roleID === serveurID) {
+            message.reply({ content: "Tu ne peux pas attribuer le rôle @everyone !", ephemeral: true });
+            return;
+        }
 
         try {
 

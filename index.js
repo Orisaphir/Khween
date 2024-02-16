@@ -1,4 +1,5 @@
 //Modules pour le fonctionnement du programme
+const { Khween } = require('./app.js');
 const fs = require('fs');
 const extract_zip = require('extract-zip');
 const path = require('path');
@@ -16,6 +17,37 @@ const loadCommands = require("./loaders/loadCommands");
 const loadEvents = require("./loaders/loadEvents");
 
 //Fichier config
+if (!fs.existsSync('./config.json')) {
+    fs.writeFileSync('./config.json', JSON.stringify({
+        "BOT_TOKEN": "",
+        "ACTIVITY_TYPE": "Playing",
+        "ACTIVITY_NAME": "modérer",
+        "ACTIVITY_STATUS": "online",
+        "ACTIVITY_URL": null
+    }, null, 2));
+    console.log('Fichier config.json créé.');
+}
+
+// Vérifier que le fichier config.json a les bonnes valeurs
+const configCheck = require('./config.json');
+if (!configCheck.ACTIVITY_TYPE || !configCheck.ACTIVITY_NAME || !configCheck.ACTIVITY_STATUS || !configCheck.ACTIVITY_URL) {
+    const token = configCheck.BOT_TOKEN;
+    fs.rmSync('./config.json');
+    fs.writeFileSync('./config.json', JSON.stringify({
+        "BOT_TOKEN": token,
+        "ACTIVITY_TYPE": "Playing",
+        "ACTIVITY_NAME": "modérer",
+        "ACTIVITY_STATUS": "online",
+        "ACTIVITY_URL": null
+    }, null, 2));
+    console.log('\n\nFichier config.json mis à jour. Veuillez redémarrer Khween.\n');
+    process.exit(1);
+}
+
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 const config = require("./config.json");
 
 //Music
@@ -23,6 +55,7 @@ const { Player } = require('discord-player');
 client.config = require('./playerconf');
 global.player = new Player(client, client.config.opt.discordPlayer);
 
+//Variable pour les erreurs
 var ErreurCode;
 (function (ErreurCode){
     ErreurCode[ErreurCode["None"] = 0] = "None";
@@ -30,15 +63,6 @@ var ErreurCode;
     ErreurCode[ErreurCode["UpdateFailed"] = 2] = "UpdateFailed";
     ErreurCode[ErreurCode["CriticalError"] = 3] = "CriticalError";
 })(ErreurCode || (ErreurCode = {}));
-
-class Package {
-    version = '';
-}
-
-class Khween {
-    package = new Package();
-
-}
 
 //Login
 main()
@@ -48,9 +72,17 @@ async function main() {
 }
 
 async function init() {
+    if (config.BOT_TOKEN === '') {
+        await getToken();
+    }
     Khween.package = await getPackage();
     put(`\nKhween v${Khween.package.version}`);
     put('Initialisation de Khween...\n');
+    Khween.token = config.BOT_TOKEN;
+    Khween.activity_type = config.ACTIVITY_TYPE;
+    Khween.activity_name = config.ACTIVITY_NAME;
+    Khween.activity_status = config.ACTIVITY_STATUS;
+    Khween.activity_url = config.ACTIVITY_URL;
     put('\nRecherche de mises à jour...\n')
     await shouldUpdate();
     if (await shouldUpdate() === true) {
@@ -65,8 +97,8 @@ async function init() {
         put('Aucune mise à jour disponible.\n');
     }
     put('\nConnexion à Discord...\n');
-    client.login(config.BOT_TOKEN);
-    put('Connecté à Discord\n');
+    await loginWithRetry();
+    readline.close();
     client.commands = [];
     put('\n\nChargement des commandes...')
     loadCommands(client);
@@ -227,4 +259,42 @@ async function update() {
     progress(1);
     put(`La mise à jour a bien été installée.`);
     return true;
+}
+
+async function getToken() {
+    while (true) {
+        const token = await new Promise((resolve) => {
+            readline.question('Token: ', token => {
+                if (token.trim() === '') {
+                    console.log('Veuillez entrer un token valide.');
+                    resolve(null);
+                } else {
+                    let config = require('./config.json');
+                    config.BOT_TOKEN = token;
+                    fs.writeFileSync('./config.json', JSON.stringify(config, null, 2));
+                    console.log('Token enregistré.');
+                    resolve(token);
+                }
+            });
+        });
+
+        if (token) {
+            break;
+        }
+    }
+}
+
+async function loginWithRetry() {
+    let loggedIn = false;
+    while (!loggedIn) {
+        try {
+            await client.login(Khween.token);
+            loggedIn = true;
+            put('Connecté à Discord\n');
+        } catch (error) {
+            put('Erreur: Impossible de se connecter à Discord avec le token actuel. Veuillez entrer un nouveau token.');
+            await getToken();
+            Khween.token = config.BOT_TOKEN;
+        }
+    }
 }

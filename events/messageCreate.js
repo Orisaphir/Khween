@@ -4,6 +4,7 @@ const Level = require("../modules/xp")
 const Admins = require("../modules/Admin")
 const Msg = require("../modules/Msg")
 const Infos = require("../modules/Infos")
+const Reward = require("../modules/Reward")
 
 module.exports = async (client, message, member) => {
 
@@ -28,6 +29,17 @@ module.exports = async (client, message, member) => {
     }
     catch (err) {
         console.log(`Erreur lors de la récupération du channel de level up : ${err}`);
+    }
+    let NewRole = message.channel;
+    try {
+        const NewRoleChannel = await Msg.findOne({ where: { Infos: "NewRole" } });
+        if (NewRoleChannel.Niveau === true) {
+            const LevelChannel = await Infos.findOne({ where: { Infos: "levelup" } });
+            NewRole = await message.guild.channels.cache.get(LevelChannel.DiscordID);
+        }
+    }
+    catch (err) {
+        console.log(`Erreur lors de la récupération du channel de level up pour le NewRole : ${err}`);
     }
 
     const MembreID = message.author.id;
@@ -83,8 +95,44 @@ module.exports = async (client, message, member) => {
                 }
             }
 
+            let rolemsg = `Tu as débloqué un nouveau rôle`
+
+            const rolemsgConfig = await Msg.findOne({ where: { Infos: "NewRole" } });
+            const Part1Role = rolemsgConfig.Part1;
+            const MentionRole = rolemsgConfig.Mention;
+            let Part2Role = rolemsgConfig.Part2;
+            if (Part2Role === null) {
+                Part2Role = "";
+            }
+            let Part3Role = rolemsgConfig.Part3;
+            if (Part3Role === null) {
+                Part3Role = "";
+            }
+            if (Part1Role !== null) {
+                if (MentionRole === true) {
+                    rolemsg = `${Part1Role} ${message.author.username} ${Part2Role} ${Part3Role}`;
+                }
+                else {
+                    rolemsg = `${Part1Role} ${Part2Role} ${Part3Role}`;
+                }
+            }
+
             Level.create(champs);
-            levelUp.send(levelmsg)
+            const isLevelUpSend = await Admins.findOne({ where: { Module: "levelup" } });
+            if (isLevelUpSend.Valeur === true) {
+                levelUp.send(levelmsg);
+            }
+            const reward = await Reward.findOne({ where: { IDServeur: ServeurID, Level: level } });
+            if (reward) {
+                const role = message.guild.roles.cache.get(reward.IDRole);
+                if (role) {
+                    message.member.roles.add(role);
+                    const isNewRoleSend = await Admins.findOne({ where: { Module: "NewRole" } });
+                    if (isNewRoleSend.Valeur === true) {
+                        NewRole.send(rolemsg);
+                    }
+                }
+            }
         } catch (err) {
             try {
                 adminInfos.update({ Valeur: false }, { where: { Module: "xp" } });
@@ -104,12 +152,11 @@ module.exports = async (client, message, member) => {
             }
         };
     } else {
-
-        
+        const newxp = ge
         const xplevel = level * level * 50
         let xp = await search.get("xp");
         const xpavant = Number(xp)
-        let result = xpavant + ge
+        let result = xpavant + newxp
         resultLevel = level + 1
 
         try {
@@ -151,10 +198,43 @@ module.exports = async (client, message, member) => {
                         }
                     }
                 }
+            
+                let rolemsg = `Tu as débloqué un nouveau rôle`
+
+                const rolemsgConfig = await Msg.findOne({ where: { Infos: "NewRole" } });
+                const Part1Role = rolemsgConfig.Part1;
+                const MentionRole = rolemsgConfig.Mention;
+                let Part2Role = rolemsgConfig.Part2;
+                if (Part2Role === null) {
+                    Part2Role = "";
+                }
+                let Part3Role = rolemsgConfig.Part3;
+                if (Part3Role === null) {
+                    Part3Role = "";
+                }
+                if (Part1Role !== null) {
+                    if (MentionRole === true) {
+                        rolemsg = `${Part1Role} ${message.author.username} ${Part2Role} ${Part3Role}`;
+                    }
+                    else {
+                        rolemsg = `${Part1Role} ${Part2Role} ${Part3Role}`;
+                    }
+                }
 
                 Level.update({ level: resultLevel }, { where: { IDMembre: MembreID} });
                 Level.update({ xp: 0 }, { where: { IDMembre: MembreID} });
                 levelUp.send(levelmsg)
+                const reward = await Reward.findOne({ where: { IDServeur: ServeurID, Level: resultLevel } });
+                if (reward) {
+                    const role = message.guild.roles.cache.get(reward.IDRole);
+                    if (role) {
+                        message.member.roles.add(role);
+                        const isNewRoleSend = await Admins.findOne({ where: { Module: "NewRole" } });
+                        if (isNewRoleSend.Valeur === true) {
+                            NewRole.send(rolemsg);
+                        }
+                    }
+                }
             }
         } catch (err) {
             try {

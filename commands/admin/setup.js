@@ -14,7 +14,7 @@ module.exports = {
                 .setName("type")
                 .setDescription("Type de configuration")
                 .setRequired(true)
-                .addChoices({ name: 'ticket', value: 'ticket' }, { name: 'xp', value: 'xp' }, { name: 'vérification', value: 'verify' }, { name: 'logs', value: 'logs' }, { name: 'arrivées et départs', value: 'WelcomeLeave' }, { name: 'stats serveur', value: 'stats' })
+                .addChoices({ name: 'ticket', value: 'ticket' }, { name: 'xp', value: 'xp' }, { name: 'vérification', value: 'verify' }, { name: 'logs', value: 'logs' }, { name: 'arrivées et départs', value: 'WelcomeLeave' }, { name: 'stats serveur', value: 'stats' }, { name: 'Message de level up', value: 'levelup' }, { name: 'Message de nouveau rôle', value: 'newrole' })
         )
         .addIntegerOption((options) =>
             options
@@ -37,6 +37,8 @@ module.exports = {
         const checkStats = await Admins.findOne({ where: { Module: "stats" } });
         const checkStatsMembersConfig = await Infos.findOne({ where: { Infos: "statsmembers" } });
         const checkStatsBotsConfig = await Infos.findOne({ where: { Infos: "statsbots" } });
+        const checkLevelUp = await Admins.findOne({ where: { Module: "levelup" } });
+        const checkNewRole = await Admins.findOne({ where: { Module: "NewRole" } });
         try {
             if (ModuleType === "ticket") {
                 if (ModuleValue.value === 1) {
@@ -93,6 +95,24 @@ module.exports = {
                 } else {
                     if (checkStats.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
                     await Admins.update({ Valeur: false }, { where: { Module: "stats" } });
+                }
+            }
+            if (ModuleType === "levelup") {
+                if (ModuleValue.value === 1) {
+                   if (checkLevelUp.Valeur === true) return message.reply({ content: "Les messages de levelup sont déjà activés", ephemeral: true });
+                    await Admins.update({ Valeur: true }, { where: { Module: "levelup" } });
+                } else {
+                    if (checkLevelUp.Valeur === false) return message.reply({ content: "Les messages de levelup sont déjà désactivés", ephemeral: true });
+                    await Admins.update({ Valeur: false }, { where: { Module: "levelup" } });
+                }
+            }
+            if (ModuleType === "newrole") {
+                if (ModuleValue.value === 1) {
+                   if (checkNewRole.Valeur === true) return message.reply({ content: "Les messages de nouveau rôle sont déjà activés", ephemeral: true });
+                    await Admins.update({ Valeur: true }, { where: { Module: "NewRole" } });
+                } else {
+                    if (checkNewRole.Valeur === false) return message.reply({ content: "Les messages de nouveau rôle sont déjà désactivés", ephemeral: true });
+                    await Admins.update({ Valeur: false }, { where: { Module: "NewRole" } });
                 }
             }
             await message.reply({ content: "La configuration a bien été enregistrée", ephemeral: true });

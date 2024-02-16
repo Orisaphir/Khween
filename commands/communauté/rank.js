@@ -1,6 +1,7 @@
 const { PermissionFlagsBits, SlashCommandBuilder, AttachmentBuilder, EmbedBuilder } = require("discord.js");
 const Canvas = require("@napi-rs/canvas");
 const Level = require("../../modules/xp");
+const Msg = require("../../modules/Msg");
 
 module.exports = {
 
@@ -29,6 +30,28 @@ module.exports = {
             }
         }
 
+        let TitleRank = `**Rank de ${user.username}**`
+
+        const rankTitleConfig = await Msg.findOne({ where: { Infos: "RankTitle" } });
+        const Title1 = rankTitleConfig.Part1;
+        const Mention = rankTitleConfig.Mention;
+        let Title2 = rankTitleConfig.Part2;
+        if (Title2 === null) {
+            Title2 = "";
+        }
+        let Title3 = rankTitleConfig.Part3;
+        if (Title3 === null) {
+            Title3 = "";
+        }
+        if (Title1 !== null) {
+            if (Mention === true) {
+                TitleRank = `${Title1} ${user.username} ${Title2} ${Title3}`;
+            }
+            else {
+                TitleRank = `${Title1} ${Title2} ${Title3}`;
+            }
+        }
+
         const level = await search.get("level");
         const xp = await search.get("xp");
 
@@ -37,6 +60,40 @@ module.exports = {
         const randomColor = colors[randomColorNo];
 
         const nextLVL = Math.floor(level * level * 50);
+
+        const allLevels = await Level.findAll({ where: { IDServeur: message.guild.id } });
+        const sortedLevels = allLevels.sort((a, b) => b.xp - a.xp);
+        const rank = sortedLevels.findIndex((lvl) => lvl.IDMembre === user.id) + 1;
+
+        let RankMsg = `${rank}ème au classement !`
+        if (rank === 1) {
+            RankMsg = `Top #${rank} du classement !`
+        }
+
+        let ranked = `${rank}ème`
+        if (rank === 1) {
+            ranked = `Top #${rank}`
+        }
+
+        const rankMsgConfig = await Msg.findOne({ where: { Infos: "Rank" } });
+        const Msg1 = rankMsgConfig.Part1;
+        let Msg2 = rankMsgConfig.Part2;
+        if (Msg2 === null) {
+            Msg2 = "";
+        }
+        let ShowRank = rankMsgConfig.Mention;
+        let Msg3 = rankMsgConfig.Part3;
+        if (Msg3 === null) {
+            Msg3 = "";
+        }
+        if (Msg1 !== null) {
+            if (ShowRank === true) {
+                RankMsg = `${Msg1} ${ranked} ${Msg2} ${Msg3}`;
+            }
+            else {
+                RankMsg = `${Msg1} ${Msg2} ${Msg3}`;
+            }
+        }
 
         const canvas = Canvas.createCanvas(1000, 300);
         const ctx = canvas.getContext('2d'),
@@ -85,7 +142,7 @@ module.exports = {
 
         ctx.fillStyle = randomColor;
         ctx.font = "bold 40px trebuchet-ms";
-        ctx.fillText("L'ANNEAU UNIQUE", 580, 80);
+        ctx.fillText(RankMsg, 580, 80);
 
         ctx.fillStyle = "lightgrey";
         ctx.font = "bold 22px tahoma";
@@ -102,7 +159,7 @@ module.exports = {
 
         try {
             const welcomeEmbed = new EmbedBuilder()
-                .setTitle(`**Rank de ${user.username}**`)
+                .setTitle(TitleRank)
                 .setImage('attachment://levelDisplay.png')
                 .setColor(randomColor)
                 .setTimestamp();

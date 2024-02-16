@@ -14,13 +14,13 @@ module.exports = {
                 .setName("type")
                 .setDescription("Type de message")
                 .setRequired(true)
-                .addChoices({ name: `Message d'arrivé Serveur`, value: 'welcome' }, { name: `Titre du message d'arrivé Serveur`, value: 'welcomeTitle' }, { name: `Footer du message d'arrivé Serveur`, value: 'welcomeFooter' }, { name: `Message de départ Serveur`, value: 'leave' }, { name: `Titre du message de départ Serveur`, value: 'leaveTitle' }, { name: `Footer du message de départ Serveur`, value: 'leaveFooter' }, { name: `Message du support Ticket`, value: 'ticket' }, { name: `Message de vérification`, value: 'verify' }, { name: `Message de passage de niveau`, value: 'levelup' })
+                .addChoices({ name: `Message d'arrivé Serveur`, value: 'welcome' }, { name: `Titre du message d'arrivé Serveur`, value: 'welcomeTitle' }, { name: `Footer du message d'arrivé Serveur`, value: 'welcomeFooter' }, { name: `Message de départ Serveur`, value: 'leave' }, { name: `Titre du message de départ Serveur`, value: 'leaveTitle' }, { name: `Footer du message de départ Serveur`, value: 'leaveFooter' }, { name: `Message du support Ticket`, value: 'ticket' }, { name: `Message de vérification`, value: 'verify' }, { name: `Message de passage de niveau`, value: 'levelup' }, { name: `Titre du message du rank`, value: 'ranktitle'}, { name: `Message de rank`, value: 'rank' }, { name: `Message du nouveau rôle`, value: 'newrole' })
         )
         .addStringOption((options) => options.setName("part1").setDescription('Message ou première partie du message à envoyer').setRequired(true))
         .addIntegerOption((options) =>
             options
                 .setName("mention")
-                .setDescription("Mentionner l'utilisateur ? / Afficher le nombre de membres ?")
+                .setDescription("Mentionner l'utilisateur ? / Afficher le nombre de membres ? / Afficher le rank ?")
                 .setRequired(true)
                 .addChoices({ name: 'Oui', value: 1 }, { name: 'Non', value: 0 })
         )
@@ -28,7 +28,7 @@ module.exports = {
         .addIntegerOption((options) =>
             options
                 .setName("niveau")
-                .setDescription("Afficher le niveau (seulement pour le message de passage de niveau) ?")
+                .setDescription("Afficher le niveau (seulement pour le message du levelup) ? / New Role dans le channel de niveau ?")
                 .setRequired(false)
                 .addChoices({ name: 'Oui', value: 1 }, { name: 'Non', value: 0 })
         )
@@ -86,6 +86,12 @@ module.exports = {
             }
             if (Type === "levelup") {
                 await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "LevelUp" } });
+            }
+            if (Type === 'ranktitle') {
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "RankTitle" } });
+            }
+            if (Type === 'rank') {
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "Rank" } });
             }
             await message.reply({ content: "La configuration a bien été enregistrée. Merci de faire un /configedit pour appliquer les changements sur les différents messages.", ephemeral: true });
         } catch (err) {
