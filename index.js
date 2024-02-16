@@ -30,7 +30,7 @@ if (!fs.existsSync('./config.json')) {
 
 // Vérifier que le fichier config.json a les bonnes valeurs
 const configCheck = require('./config.json');
-if (!configCheck.ACTIVITY_TYPE || !configCheck.ACTIVITY_NAME || !configCheck.ACTIVITY_STATUS || !configCheck.ACTIVITY_URL) {
+if (!configCheck.ACTIVITY_TYPE || !configCheck.ACTIVITY_NAME || !configCheck.ACTIVITY_STATUS) {
     const token = configCheck.BOT_TOKEN;
     fs.rmSync('./config.json');
     fs.writeFileSync('./config.json', JSON.stringify({
