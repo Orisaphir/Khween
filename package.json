@@ -1,6 +1,6 @@
 {
   "name": "khween",
-  "version": "0.5.3.1",
+  "version": "0.5.3.2",
   "description": "Bot Discord",
   "main": "index.js",
   "scripts": {

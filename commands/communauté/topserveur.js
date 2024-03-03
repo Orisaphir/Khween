@@ -21,7 +21,7 @@ module.exports = {
 
         let timestamp = Date.now();
         let eph = true;
-        if (message.options.getInteger('public') === 1) {
+        if (message.options.getInteger('publique') === 1) {
             eph = false;
         }
 

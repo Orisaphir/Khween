@@ -7,9 +7,21 @@ module.exports = {
         .setName('top')
         .setDescription("affiche le top 10 du serveur")
         .setDMPermission(false)
-        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages),
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+        .addIntegerOption((options) =>
+            options
+                .setName("publique")
+                .setDescription("Rendre le message publique ?")
+                .setRequired(false)
+                .addChoices({ name: 'Oui', value: 1 }, { name: 'Non', value: 0 })
+        ),
 
     async run(client, message, args) {
+
+        let eph = true;
+        if (message.options.getInteger('publique') === 1) {
+            eph = false;
+        }
 
         const serveurID = message.guild.id;
         const search = await Level.findAll({ where: { IDServeur: serveurID }, order: [['level', 'DESC'], ['xp', 'DESC']], limit: 10 });
@@ -32,6 +44,6 @@ module.exports = {
             .setDescription(top)
             .setColor("#007FFF");
 
-        message.reply({ embeds: [embed], ephemeral: true });
+        message.reply({ embeds: [embed], ephemeral: eph });
     }
 };
