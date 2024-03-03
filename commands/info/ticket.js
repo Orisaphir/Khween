@@ -21,14 +21,40 @@ module.exports = {
 
     async run(client, inter) {
 
+        const ServeurID = inter.guild.id;
+
+        await Infos.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Infos.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+        await Admins.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Admins.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+        await HistoData.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await HistoData.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+        await Msg.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Msg.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+
         const GetForce = inter.options.getInteger("force");
         let force = false;
         if (GetForce === 1)
             force = true;
 
-        const openticketInfos = await Infos.findOne({ where: { Infos: "openticket" } });
-        const adminInfos = await Admins.findOne({ where: { Module: "ticket" } });
-        const HistoTicket = await HistoData.findOne({ where: { Infos: "Ticket" } });
+        const openticketInfos = await Infos.findOne({ where: { Infos: "openticket", IDServeur: ServeurID } });
+        if (!openticketInfos) return inter.reply({ content: "Le salon du support Ticket n'est pas configuré, veuillez le configurer avec la commande /config", ephemeral: true });
+        const adminInfos = await Admins.findOne({ where: { Module: "ticket", IDServeur: ServeurID } });
+        if (!adminInfos) await Admins.create({ IDServeur: ServeurID, Module: "ticket", Valeur: false });
+        const HistoTicket = await HistoData.findOne({ where: { Infos: "Ticket", IDServeur: ServeurID } });
+        if (!HistoTicket) await HistoData.create({ IDServeur: ServeurID, Infos: "Ticket", Channel: null, Message: null });
         if (openticketInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer le Channel où sera envoyé le Ticket avec la commande /config", ephemeral: true });
         if (adminInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez l'activer avec la commande /setup", ephemeral: true });
         if (HistoTicket.Message !== null) return inter.reply({ content: "Le support Ticket est déjà créé", ephemeral: true });
@@ -37,7 +63,7 @@ module.exports = {
         try {
             const CheckChannel = await inter.guild.channels.cache.get(openticket);
             if (!CheckChannel) {
-                await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "openticket" } });
+                await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "openticket", IDServeur: ServeurID } });
                 return inter.reply({ content: "Le salon du support Ticket n'existe plus ou est introuvable. Merci de le reconfigurer avec la commande /config !", ephemeral: true });
             
             }
@@ -55,7 +81,7 @@ module.exports = {
 
         let msgDesc = "Ouvrir un ticket support";
 
-        const data = await Msg.findOne({ where: { Infos: "Ticket" } });
+        const data = await Msg.findOne({ where: { Infos: "Ticket", IDServeur: ServeurID } });
         const Part1 = data.Part1;
         let Part2 = data.Part2;
         if (Part2 === null) Part2 = "";
@@ -82,7 +108,7 @@ module.exports = {
 
         const messagesend = await guild.channels.cache.get(openticket).messages.fetch({ limit: 1 });
         const messagesendID = messagesend.first().id;
-        await HistoTicket.update({ Channel: openticket, Message: messagesendID }, { where: { Infos: "Ticket" } });
+        await HistoTicket.update({ Channel: openticket, Message: messagesendID }, { where: { Infos: "Ticket", IDServeur: ServeurID } });
 
         inter.reply({content: "Le ticket a bien été envoyé", ephemeral: true});
     }

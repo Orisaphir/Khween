@@ -24,6 +24,7 @@ module.exports = {
             emojiID = emojimessage2.input;
         };
         const Emoji = emojicheck || emojicheck2
+        const serveurID = message.guild.id;
         if (!Emoji) {
             message.reply({ content: "L'émoji indiqué n'existe pas ou n'est pas sur le serveur !", ephemeral: true });
             return;
@@ -32,14 +33,14 @@ module.exports = {
             emojimessage = emojimessage2.input;
         };
         const ForBDD = message.options.getString("emoji");
-        const EmojiCheckBDD = await Emojis.findAll({ where: { IDemoji: ForBDD } });
+        const EmojiCheckBDD = await Emojis.findAll({ where: { IDemoji: ForBDD, IDServeur: serveurID } });
         if (!EmojiCheckBDD || EmojiCheckBDD.length === 0) {
             message.reply({ content: "Cet émoji ne fait parti d'aucun réaction rôle !", ephemeral: true });
             return;
         }
         const MessageID = message.options.getString("message");
         if (isNaN(MessageID)) return message.reply({ content: "Tu ne m'as pas donné un ID ! C'est une suite de 17 à 19 chiffres qu'il me faut !", ephemeral: true });
-        const MessageBDD = await Emojis.findAll({ where: { IDmessage: MessageID } });
+        const MessageBDD = await Emojis.findAll({ where: { IDmessage: MessageID, IDServeur: serveurID } });
         if (!MessageBDD || MessageBDD.length === 0) {
             message.reply({ content: "Le message indiqué ne fait pas parti d'un réaction rôle ou l'ID indiqué n'est pas valide !", ephemeral: true });
             return;
@@ -62,7 +63,7 @@ module.exports = {
                     return channel.send("Je n'ai pas pu retirer ma réactions sur le message, merci de le faire manuellement au besoin ! https://discord.com/channels/" + CorrectLine.IDServeur + '/' + CorrectLine.IDChannel + '/' + CorrectLine.IDmessage)
                 }).catch(console.error)
             }
-            await Emojis.destroy({ where: { IDmessage: CorrectLine.IDmessage, IDemoji: CorrectLine.IDemoji } });
+            await Emojis.destroy({ where: { IDmessage: CorrectLine.IDmessage, IDemoji: CorrectLine.IDemoji, IDServeur: serveurID } });
             await message.reply({ content: "Le réaction rôle indiqué a bien été supprimé !", ephemeral: true });
         } catch (err) {
             message.reply({ content: "Une erreur est survenue à la suppression du réaction rôle. Merci de contacter @Orisaphir au plus vite.", ephemeral: true });

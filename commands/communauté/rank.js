@@ -14,9 +14,10 @@ module.exports = {
 
     async run(client, message, args) {
 
+        const serveurID = message.guild.id;
         const user = message.options.getUser("membre") ?? message.user
         const MembreID = user.id
-        const search = await Level.findOne({ where: { IDMembre: MembreID } });
+        const search = await Level.findOne({ where: { IDMembre: MembreID, IDServeur: serveurID } });
 
         if (!search) {
             if (message.user.id === user.id) {
@@ -32,7 +33,7 @@ module.exports = {
 
         let TitleRank = `**Rank de ${user.username}**`
 
-        const rankTitleConfig = await Msg.findOne({ where: { Infos: "RankTitle" } });
+        const rankTitleConfig = await Msg.findOne({ where: { Infos: "RankTitle", IDServeur: serveurID } });
         const Title1 = rankTitleConfig.Part1;
         const Mention = rankTitleConfig.Mention;
         let Title2 = rankTitleConfig.Part2;
@@ -61,7 +62,7 @@ module.exports = {
 
         const nextLVL = Math.floor(level * level * 50);
 
-        const allLevels = await Level.findAll({ where: { IDServeur: message.guild.id } });
+        const allLevels = await Level.findAll({ where: { IDServeur: serveurID } });
         const sortedLevels = allLevels.sort((a, b) => b.xp - a.xp);
         const rank = sortedLevels.findIndex((lvl) => lvl.IDMembre === user.id) + 1;
 
@@ -75,7 +76,7 @@ module.exports = {
             ranked = `Top #${rank}`
         }
 
-        const rankMsgConfig = await Msg.findOne({ where: { Infos: "Rank" } });
+        const rankMsgConfig = await Msg.findOne({ where: { Infos: "Rank", IDServeur: serveurID } });
         const Msg1 = rankMsgConfig.Part1;
         let Msg2 = rankMsgConfig.Part2;
         if (Msg2 === null) {

@@ -32,6 +32,7 @@
 //DONE
 
 // V0.5.3 Rajouter une commande pour voir les rewards actuels et une commande /top pour voir les 10 premiers membres du serveur. Peut être une commande /topserveur pour voir le classement entier du serveur
+//DONE
 
 // v0.5.4 Faire en sorte que les réactions sur les messages de la BDD reactionrole soit retirées lors des différents events qui destroy les lignes de la BDD
 
@@ -40,6 +41,8 @@
 // v0.6.1 Pour la commande /rr, faire en sorte que l'utilisateur puisse indiquer le lien du message et que le bot récupère l'id tout seul
 
 // ...
+
+// v0.?.0 Faire un starboard
 
 // v0.?.0 Faire une commande ErreurDM qui permet de choisir l'id de la personne à qui envoyer les erreurs en DM (Ori par défaut)
 

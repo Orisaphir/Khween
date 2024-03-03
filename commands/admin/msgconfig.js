@@ -35,6 +35,14 @@ module.exports = {
         .addStringOption((options) => options.setName("part3").setDescription('Troisième partie du message à envoyer').setRequired(false)),
 
     async run(_, message) {
+        const ServeurID = message.guild.id;
+
+        await Msg.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Msg.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+
         const Type = message.options.getString('type');
         const Part1 = message.options.getString('part1');
         const Mention = message.options.getInteger('mention');
@@ -61,37 +69,92 @@ module.exports = {
         if (Part3 !== null && Part3.length > 2000) return message.reply({ content: "Le message partie 3 est trop long !", ephemeral: true });
         try {
             if (Type === "welcome") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "Welcome" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "Welcome" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "Welcome" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "Welcome", IDServeur: ServeurID } });
             }
             if (Type === "welcomeTitle") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "WelcomeTitle" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "WelcomeTitle" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "WelcomeTitle" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "WelcomeTitle", IDServeur: ServeurID } });
             }
             if (Type === "welcomeFooter") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "WelcomeFooter" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "WelcomeFooter" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "WelcomeFooter" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "WelcomeFooter", IDServeur: ServeurID } });
             }
             if (Type === "leave") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "Leave" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "Leave" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "Leave" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "Leave", IDServeur: ServeurID } });
             }
             if (Type === "leaveTitle") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "LeaveTitle" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "LeaveTitle" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "LeaveTitle" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "LeaveTitle", IDServeur: ServeurID } });
             }
             if (Type === "leaveFooter") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "LeaveFooter" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "LeaveFooter" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "LeaveFooter" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "LeaveFooter", IDServeur: ServeurID } });
             }
             if (Type === "ticket") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "Ticket" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "Ticket" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "Ticket" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "Ticket", IDServeur: ServeurID } });
             }
             if (Type === "verify") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "Verify" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "Verify" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "Verify" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2 }, { where: { Infos: "Verify", IDServeur: ServeurID } });
             }
             if (Type === "levelup") {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "LevelUp" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "LevelUp" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "LevelUp" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "LevelUp", IDServeur: ServeurID } });
             }
             if (Type === 'ranktitle') {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "RankTitle" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "RankTitle" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "RankTitle" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "RankTitle", IDServeur: ServeurID } });
             }
             if (Type === 'rank') {
-                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "Rank" } });
+                await Msg.findOne({ where: { IDServeur: ServeurID, Infos: "Rank" } }).then(async (data) => {
+                    if (!data) {
+                        await Msg.create({ IDServeur: ServeurID, Infos: "Rank" });
+                    }
+                });
+                await Msg.update({ Part1: Part1, Mention: MentionValue, Part2: Part2, Niveau: LevelValue, Part3: Part3 }, { where: { Infos: "Rank", IDServeur: ServeurID } });
             }
             await message.reply({ content: "La configuration a bien été enregistrée. Merci de faire un /configedit pour appliquer les changements sur les différents messages.", ephemeral: true });
         } catch (err) {

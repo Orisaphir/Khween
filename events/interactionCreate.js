@@ -34,18 +34,20 @@ function put(text){
 
 module.exports = async (client, inter) => {
 
+	const serveurID = inter.guild.id;
+
 	if (inter.isButton()) {
 		const dateheure = await getdate();
-		const adminInfos = await Admins.findOne({ where: { Module: "ticket" } });
-		const ticketchannelInfos = await Infos.findOne({ where: { Infos: "ticketchannel" } });
+		const adminInfos = await Admins.findOne({ where: { Module: "ticket", IDServeur: serveurID } });
+		const ticketchannelInfos = await Infos.findOne({ where: { Infos: "ticketchannel", IDServeur: serveurID } });
 		const ticketchannel = ticketchannelInfos.DiscordID;
-		const archiveticketInfos = await Infos.findOne({ where: { Infos: "archiveticket" } });
+		const archiveticketInfos = await Infos.findOne({ where: { Infos: "archiveticket", IDServeur: serveurID } });
 		const archiveticket = archiveticketInfos.DiscordID;
-		const openticketInfos = await Infos.findOne({ where: { Infos: "openticket" } });
+		const openticketInfos = await Infos.findOne({ where: { Infos: "openticket", IDServeur: serveurID } });
 		const openticket = openticketInfos.DiscordID;
-		const verifyroleInfos = await Infos.findOne({ where: { Infos: "verifyrole" } });
+		const verifyroleInfos = await Infos.findOne({ where: { Infos: "verifyrole", IDServeur: serveurID } });
 		const verifyrole = verifyroleInfos.DiscordID;
-		const verifysetupInfos = await Admins.findOne({ where: { Module: "verify" } });
+		const verifysetupInfos = await Admins.findOne({ where: { Module: "verify", IDServeur: serveurID } });
 		if (inter.customId === "close") {
 
 			if (archiveticketInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer le Channel où seront archivés les Tickets avec la commande /config", ephemeral: true });
@@ -56,7 +58,7 @@ module.exports = async (client, inter) => {
 				}
 				const CheckArchiveChannel = await inter.guild.channels.cache.get(archiveticket);
 				if (!CheckArchiveChannel) {
-					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "archiveticket" } });
+					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "archiveticket", IDServeur: serveurID } });
 					return inter.reply({ content: "Le salon des Tickets archivés n'existe plus ou est introuvable. Merci de le reconfigurer avec la commande /config !", ephemeral: true });
 				}
 			} catch (err) {
@@ -128,7 +130,7 @@ module.exports = async (client, inter) => {
 				}
 				const CheckTicketCategory = await inter.guild.channels.cache.get(ticketchannel);
 				if (!CheckTicketCategory) {
-					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel" } });
+					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel", IDServeur: serveurID } });
 					return inter.reply({ content: "La catégorie des Tickets n'existe plus ou est introuvable. Merci de la reconfigurer avec la commande /config !", ephemeral: true });
 				}
 			} catch (err) {
@@ -191,7 +193,7 @@ module.exports = async (client, inter) => {
 			try {
 				const CheckTicketCategory = await inter.guild.channels.cache.get(ticketchannel);
 				if (!CheckTicketCategory) {
-					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel" } });
+					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel", IDServeur: serveurID } });
 					return inter.reply({ content: "La catégorie des Tickets n'existe plus ou est introuvable. Merci de la reconfigurer avec la commande /config !", ephemeral: true });
 				}
 			} catch (err) {
@@ -241,7 +243,7 @@ module.exports = async (client, inter) => {
 			try {
 				const CheckTicketCategory = await inter.guild.channels.cache.get(ticketchannel);
 				if (!CheckTicketCategory) {
-					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel" } });
+					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel", IDServeur: serveurID } });
 					return inter.reply({ content: "La catégorie des Tickets n'existe plus ou est introuvable. Merci de la reconfigurer avec la commande /config !", ephemeral: true });
 				}
 			} catch (err) {
@@ -291,7 +293,7 @@ module.exports = async (client, inter) => {
 			try {
 				const CheckTicketCategory = await inter.guild.channels.cache.get(ticketchannel);
 				if (!CheckTicketCategory) {
-					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel" } });
+					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel", IDServeur: serveurID } });
 					return inter.reply({ content: "La catégorie des Tickets n'existe plus ou est introuvable. Merci de la reconfigurer avec la commande /config !", ephemeral: true });
 				}
 			} catch (err) {
@@ -341,7 +343,7 @@ module.exports = async (client, inter) => {
 			try {
 				const CheckTicketCategory = await inter.guild.channels.cache.get(ticketchannel);
 				if (!CheckTicketCategory) {
-					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel" } });
+					await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "ticketchannel", IDServeur: serveurID } });
 					return inter.reply({ content: "La catégorie des Tickets n'existe plus ou est introuvable. Merci de la reconfigurer avec la commande /config !", ephemeral: true });
 				}
 			} catch (err) {

@@ -23,8 +23,8 @@ module.exports = {
         }
         const level = message.options.getInteger('niveau');
         const role = message.options.getRole('role');
+        const IDServeur = message.guild.id;
         try {
-            const IDServeur = message.guild.id;
             if (role.id === IDServeur) return message.reply({ content: `Tu ne peux pas attribuer le rôle @everyone !`, ephemeral: true });
             const rolecheck = message.guild.roles.cache.get(role.id);
             const isAdministrator = rolecheck.permissions.has(PermissionFlagsBits.Administrator);
@@ -32,8 +32,8 @@ module.exports = {
             if (isAdministrator) return message.reply({ content: `Tu ne peux pas attribuer un rôle administrateur à un niveau !`, ephemeral: true });
             if (role.position >= message.member.roles.highest.position) return message.reply({ content: `Le rôle ${role} est au dessus ou égal au miens dans la hiérarchie des rôles, je ne pourrai pas le donner. Merci d'en choisir un autre !`, ephemeral: true });
 
-            const reward = await Reward.findOne({ where: { level: level } });
-            const roleAlready = await Reward.findOne({ where: { IDRole: role.id } });
+            const reward = await Reward.findOne({ where: { level: level, IDServeur: IDServeur } });
+            const roleAlready = await Reward.findOne({ where: { IDRole: role.id, IDServeur: IDServeur } });
             if (reward) {
                 levelrole = reward.IDRole
                 return message.reply({ content: `Il y a déjà un rôle pour le niveau ${level} (<@&${levelrole}>) !`, ephemeral: true });
@@ -67,7 +67,7 @@ module.exports = {
             if (levels) {
                 const Membres = await message.guild.members.fetch();
                 Membres.forEach(async (membre) => {
-                    const searchMembre = await Level.findOne({ where: { IDMembre: membre.id } });
+                    const searchMembre = await Level.findOne({ where: { IDMembre: membre.id, IDServeur: IDServeur } });
                     if (searchMembre) {
                         const levelMembre = await searchMembre.get("level");
                         if (levelMembre >= level) {

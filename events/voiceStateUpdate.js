@@ -23,8 +23,9 @@ async function getdate() {
 
 
 module.exports = async (client, oldState, newState) => {
+    const serveurID = oldState.guild.id || newState.guild.id;
     if (oldState.member.user.bot || newState.member.user.bot) return;
-    const AdminCheck = await Admins.findOne({ where: { Module: 'logs' } });
+    const AdminCheck = await Admins.findOne({ where: { Module: 'logs', IDServeur: serveurID } });
     if (AdminCheck.Valeur === false) return;
     let orisaphir = null;
     try {
@@ -35,14 +36,14 @@ module.exports = async (client, oldState, newState) => {
         console.log(`Erreur lors de la récupération de Ori : ${err}`);
     }
     try {
-        const CheckLogs = await Infos.findOne({ where: { Infos: 'logs' } });
+        const CheckLogs = await Infos.findOne({ where: { Infos: 'logs', IDServeur: serveurID } });
         if (oldState.channel === null && newState.channel !== null) {
             const user = newState.member.displayName;
             const username = newState.member.user.username;
             const channel = newState.channel;
             const heure = await getdate();
             if (CheckLogs.Valeur === true) {
-                const logsInfo = await Infos.findOne( { where: { Infos: 'logs' } });
+                const logsInfo = await Infos.findOne( { where: { Infos: 'logs', IDServeur: serveurID } });
                 const logsChannel = newState.guild.channels.cache.get(logsInfo.DiscordID);
                 const embed = new EmbedBuilder()
                     .setTitle(`Logs de connexion à un salon vocal (${username})`)
@@ -59,7 +60,7 @@ module.exports = async (client, oldState, newState) => {
             const channel = oldState.channel;
             const heure = await getdate();
             if (CheckLogs.Valeur === true) {
-                const logsInfo = await Infos.findOne( { where: { Infos: 'logs' } });
+                const logsInfo = await Infos.findOne( { where: { Infos: 'logs' }, IDServeur: serveurID });
                 const logsChannel = oldState.guild.channels.cache.get(logsInfo.DiscordID);
                 const embed = new EmbedBuilder()
                     .setTitle(`Logs de déconnexion à un salon vocal (${username})`)
@@ -72,7 +73,7 @@ module.exports = async (client, oldState, newState) => {
         }
     } catch (err) {
         try {
-            AdminCheck.update({ Valeur: false }, { where: { Module: 'logs' } });
+            AdminCheck.update({ Valeur: false }, { where: { Module: 'logs', IDServeur: serveurID } });
             if(orisaphir === null || orisaphir === undefined) {
                 return console.log(`Erreur : ${err}`);
             }

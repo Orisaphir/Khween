@@ -8,6 +8,10 @@ const sequelize = new Sequelize('database', 'username', 'password', {
 });
 
 const HistoData = sequelize.define('histodata', {
+    IDServeur: {
+        type: Sequelize.STRING,
+        allowNull: true,
+    },
     Infos: {
         type: Sequelize.STRING,
         unique: true,

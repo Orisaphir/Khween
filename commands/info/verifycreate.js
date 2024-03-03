@@ -21,14 +21,41 @@ module.exports = {
 
     async run(client, inter) {
 
+        const ServeurID = inter.guild.id;
+
+        await Infos.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Infos.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+        await Admins.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Admins.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+        await HistoData.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await HistoData.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+        await Msg.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Msg.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+
         const GetForce = inter.options.getInteger("force");
         let force = false;
         if (GetForce === 1)
             force = true;
-        const verifychannelInfos = await Infos.findOne({ where: { Infos: "verifychannel" } });
-        const verifyroleInfos = await Infos.findOne({ where: { Infos: "verifyrole" } });
-        const adminInfos = await Admins.findOne({ where: { Module: "verify" } });
-        const HistoVerify = await HistoData.findOne({ where: { Infos: "Verify" } });
+        const verifychannelInfos = await Infos.findOne({ where: { Infos: "verifychannel", IDServeur: ServeurID } });
+        if (!verifychannelInfos) return inter.reply({ content: "Le salon de vérification n'est pas configuré, veuillez le configurer avec la commande /verifyconfig", ephemeral: true });
+        const verifyroleInfos = await Infos.findOne({ where: { Infos: "verifyrole", IDServeur: ServeurID } });
+        if (!verifyroleInfos) return inter.reply({ content: "Le rôle de vérification n'est pas configuré, veuillez le configurer avec la commande /verifyconfig", ephemeral: true });
+        const adminInfos = await Admins.findOne({ where: { Module: "verify", IDServeur: ServeurID } });
+        if (!adminInfos) await Admins.create({ IDServeur: ServeurID, Module: "verify", Valeur: false });
+        const HistoVerify = await HistoData.findOne({ where: { Infos: "Verify", IDServeur: ServeurID } });
+        if (!HistoVerify) await HistoData.create({ IDServeur: ServeurID, Infos: "Verify", Channel: null, Message: null });
         if (verifychannelInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer le Channel où sera envoyé le message de vérification avec la commande /verifyconfig", ephemeral: true });
         if (verifyroleInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez configurer le Rôle qui sera donné avec la commande /verifyconfig", ephemeral: true });
         if (adminInfos.Valeur === false) return inter.reply({ content: "Le module est désactivé, veuillez l'activer avec la commande /setup", ephemeral: true });
@@ -39,7 +66,7 @@ module.exports = {
         try {
             const CheckChannel = await inter.guild.channels.cache.get(verifychannel);
             if (!CheckChannel) {
-                await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "verifychannel" } });
+                await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "verifychannel", IDServeur: ServeurID } });
                 return inter.reply({ content: "Le salon de vérification n'existe plus ou est introuvable. Merci de le reconfigurer avec la commande /verifyconfig !", ephemeral: true });
             }
         } catch (err) {
@@ -49,7 +76,7 @@ module.exports = {
         try {
             const CheckRole = await inter.guild.roles.cache.get(verifyrole);
             if (!CheckRole) {
-                await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "verifyrole" } });
+                await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "verifyrole", IDServeur: ServeurID } });
                 return inter.reply({ content: "Le rôle de vérification n'existe plus ou est introuvable. Merci de le reconfigurer avec la commande /verifyconfig !", ephemeral: true });
             }
         } catch (err) {
@@ -65,7 +92,7 @@ module.exports = {
 
         let msgDesc = "Clique sur « vérifier » pour avoir accès au serveur !";
 
-        const data = await Msg.findOne({ where: { Infos: "Verify" } });
+        const data = await Msg.findOne({ where: { Infos: "Verify", IDServeur: ServeurID } });
         const Part1 = data.Part1;
         let Part2 = data.Part2;
         if (Part2 === null) Part2 = "";
@@ -90,7 +117,7 @@ module.exports = {
         });
         const messagesend = await guild.channels.cache.get(verifychannel).messages.fetch({ limit: 1 });
         const messagesendID = messagesend.first().id;
-        await HistoVerify.update({ Channel: verifychannel, Message: messagesendID }, { where: { Infos: "Verify" } });
+        await HistoVerify.update({ Channel: verifychannel, Message: messagesendID }, { where: { Infos: "Verify", IDServeur: ServeurID } });
 
 
         inter.reply({content: "Le message de vérification a bien été envoyé", ephemeral: true});

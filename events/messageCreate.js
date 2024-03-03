@@ -8,9 +8,11 @@ const Reward = require("../modules/Reward")
 
 module.exports = async (client, message, member) => {
 
+    const serveurID = message.guild.id;
+
     if (message.author.bot) return;
     if (message.channel.type === "dm") return;
-    const adminInfos = await Admins.findOne({ where: { Module: "xp" } });
+    const adminInfos = await Admins.findOne({ where: { Module: "xp" }, IDServeur: serveurID });
     if (adminInfos.Valeur === false) return;
 
     let orisaphir = null;
@@ -23,7 +25,7 @@ module.exports = async (client, message, member) => {
     }
     let levelUp = message.channel;
     try {
-        const levelUpChannel = await Infos.findOne({ where: { Infos: "levelup" } });
+        const levelUpChannel = await Infos.findOne({ where: { Infos: "levelup" }, IDServeur: serveurID });
         if (levelUpChannel.DiscordID !== null)
             levelUp = await message.guild.channels.cache.get(levelUpChannel.DiscordID);
     }
@@ -32,9 +34,9 @@ module.exports = async (client, message, member) => {
     }
     let NewRole = message.channel;
     try {
-        const NewRoleChannel = await Msg.findOne({ where: { Infos: "NewRole" } });
+        const NewRoleChannel = await Msg.findOne({ where: { Infos: "NewRole" }, IDServeur: serveurID });
         if (NewRoleChannel.Niveau === true) {
-            const LevelChannel = await Infos.findOne({ where: { Infos: "levelup" } });
+            const LevelChannel = await Infos.findOne({ where: { Infos: "levelup", IDServeur: serveurID } });
             NewRole = await message.guild.channels.cache.get(LevelChannel.DiscordID);
         }
     }
@@ -44,7 +46,7 @@ module.exports = async (client, message, member) => {
 
     const MembreID = message.author.id;
     const ServeurID = message.guild.id;
-    const search = await Level.findOne({ where: { IDMembre: MembreID } });
+    const search = await Level.findOne({ where: { IDMembre: MembreID, IDServeur: serveurID } });
     let level = 0;
     let ge = 0;
     if (search) {
@@ -64,7 +66,7 @@ module.exports = async (client, message, member) => {
             level = 1;
             let levelmsg = `Félicitation ${message.author.username} ! Tu viens de passer niveau 1 !`
 
-            const levelmsgConfig = await Msg.findOne({ where: { Infos: "LevelUp" } });
+            const levelmsgConfig = await Msg.findOne({ where: { Infos: "LevelUp", IDServeur: serveurID } });
             const Part1 = levelmsgConfig.Part1;
             const Mention = levelmsgConfig.Mention;
             let Part2 = levelmsgConfig.Part2;
@@ -97,7 +99,7 @@ module.exports = async (client, message, member) => {
 
             let rolemsg = `Tu as débloqué un nouveau rôle`
 
-            const rolemsgConfig = await Msg.findOne({ where: { Infos: "NewRole" } });
+            const rolemsgConfig = await Msg.findOne({ where: { Infos: "NewRole", IDServeur: serveurID } });
             const Part1Role = rolemsgConfig.Part1;
             const MentionRole = rolemsgConfig.Mention;
             let Part2Role = rolemsgConfig.Part2;
@@ -118,16 +120,16 @@ module.exports = async (client, message, member) => {
             }
 
             Level.create(champs);
-            const isLevelUpSend = await Admins.findOne({ where: { Module: "levelup" } });
+            const isLevelUpSend = await Admins.findOne({ where: { Module: "levelup", IDServeur: serveurID } });
             if (isLevelUpSend.Valeur === true) {
                 levelUp.send(levelmsg);
             }
-            const reward = await Reward.findOne({ where: { IDServeur: ServeurID, Level: level } });
+            const reward = await Reward.findOne({ where: { IDServeur: ServeurID, Level: level, IDServeur: serveurID } });
             if (reward) {
                 const role = message.guild.roles.cache.get(reward.IDRole);
                 if (role) {
                     message.member.roles.add(role);
-                    const isNewRoleSend = await Admins.findOne({ where: { Module: "NewRole" } });
+                    const isNewRoleSend = await Admins.findOne({ where: { Module: "NewRole", IDServeur: serveurID } });
                     if (isNewRoleSend.Valeur === true) {
                         NewRole.send(rolemsg);
                     }
@@ -135,7 +137,7 @@ module.exports = async (client, message, member) => {
             }
         } catch (err) {
             try {
-                adminInfos.update({ Valeur: false }, { where: { Module: "xp" } });
+                adminInfos.update({ Valeur: false }, { where: { Module: "xp", IDServeur: serveurID } });
                 if(orisaphir === null || orisaphir === undefined) {
                     return console.log(`Erreur : ${err}`);
                 }
@@ -161,14 +163,14 @@ module.exports = async (client, message, member) => {
 
         try {
             
-            Level.update({ xp: result }, { where: { IDMembre: MembreID} });
+            Level.update({ xp: result }, { where: { IDMembre: MembreID, IDServeur: serveurID } });
             xp = result
 
             if(xp >= xplevel){
 
                 let levelmsg = `Félicitation ${message.author.username} ! Tu viens de passer niveau ${resultLevel} !`
 
-                const levelmsgConfig = await Msg.findOne({ where: { Infos: "LevelUp" } });
+                const levelmsgConfig = await Msg.findOne({ where: { Infos: "LevelUp", IDServeur: serveurID } });
                 const Part1 = levelmsgConfig.Part1;
                 const Mention = levelmsgConfig.Mention;
                 let Part2 = levelmsgConfig.Part2;
@@ -201,7 +203,7 @@ module.exports = async (client, message, member) => {
             
                 let rolemsg = `Tu as débloqué un nouveau rôle`
 
-                const rolemsgConfig = await Msg.findOne({ where: { Infos: "NewRole" } });
+                const rolemsgConfig = await Msg.findOne({ where: { Infos: "NewRole", IDServeur: serveurID } });
                 const Part1Role = rolemsgConfig.Part1;
                 const MentionRole = rolemsgConfig.Mention;
                 let Part2Role = rolemsgConfig.Part2;
@@ -221,15 +223,15 @@ module.exports = async (client, message, member) => {
                     }
                 }
 
-                Level.update({ level: resultLevel }, { where: { IDMembre: MembreID} });
-                Level.update({ xp: 0 }, { where: { IDMembre: MembreID} });
+                Level.update({ level: resultLevel }, { where: { IDMembre: MembreID, IDServeur: serveurID } });
+                Level.update({ xp: 0 }, { where: { IDMembre: MembreID, IDServeur: serveurID } });
                 levelUp.send(levelmsg)
-                const reward = await Reward.findOne({ where: { IDServeur: ServeurID, Level: resultLevel } });
+                const reward = await Reward.findOne({ where: { IDServeur: ServeurID, Level: resultLevel, IDServeur: serveurID } });
                 if (reward) {
                     const role = message.guild.roles.cache.get(reward.IDRole);
                     if (role) {
                         message.member.roles.add(role);
-                        const isNewRoleSend = await Admins.findOne({ where: { Module: "NewRole" } });
+                        const isNewRoleSend = await Admins.findOne({ where: { Module: "NewRole", IDServeur: serveurID } });
                         if (isNewRoleSend.Valeur === true) {
                             NewRole.send(rolemsg);
                         }
@@ -238,7 +240,7 @@ module.exports = async (client, message, member) => {
             }
         } catch (err) {
             try {
-                adminInfos.update({ Valeur: false }, { where: { Module: "xp" } });
+                adminInfos.update({ Valeur: false }, { where: { Module: "xp", IDServeur: serveurID } });
                 if(orisaphir === null || orisaphir === undefined) {
                     return console.log(`Erreur : ${err}`);
                 }

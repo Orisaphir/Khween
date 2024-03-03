@@ -8,6 +8,8 @@ const Ori = `421416465430741003`
 
 module.exports = async (client, member) => {
 
+    const serveurID = member.guild.id;
+
     let orisaphir = null;
         try {
             orisaphir = await member.guild.members.fetch(Ori);
@@ -18,22 +20,22 @@ module.exports = async (client, member) => {
         }
     
     const MembreID = member.id;
-    const search = await Level.findOne({ where: { IDMembre: MembreID } });
+    const search = await Level.findOne({ where: { IDMembre: MembreID, IDServeur: serveurID } });
     if (search) {
-        await Level.destroy({ where: { IDMembre: MembreID } });
+        await Level.destroy({ where: { IDMembre: MembreID, IDServeur: serveurID } });
     }
     
     if (!member.user.bot) {
-        const checkWelcomeLeave = await Admins.findOne({ where: { Module: "WelcomeLeave" } });
+        const checkWelcomeLeave = await Admins.findOne({ where: { Module: "WelcomeLeave", IDServeur: serveurID } });
         if (checkWelcomeLeave.Valeur === false) return;
-        const checkWelcomeLeaveConfig = await Infos.findOne({ where: { Infos: "WelcomeLeave" } });
+        const checkWelcomeLeaveConfig = await Infos.findOne({ where: { Infos: "WelcomeLeave", IDServeur: serveurID } });
         if (checkWelcomeLeaveConfig.Valeur === false) return;
 
         const leaveChannel = member.guild.channels.cache.get(checkWelcomeLeaveConfig.DiscordID)
         
         let leaveTitle = "Au revoir !"
 
-        const leaveTitleConfig = await Msg.findOne({ where: { Infos: "LeaveTitle" } });
+        const leaveTitleConfig = await Msg.findOne({ where: { Infos: "LeaveTitle", IDServeur: serveurID } });
         const title1 = leaveTitleConfig.Part1;
         let title2 = leaveTitleConfig.Part2;
         if (title2 === null) {
@@ -45,7 +47,7 @@ module.exports = async (client, member) => {
 
         let leaveMessage = `Au revoir <@${member.id}> !`
 
-        const leaveMessageConfig = await Msg.findOne({ where: { Infos: "Leave" } });
+        const leaveMessageConfig = await Msg.findOne({ where: { Infos: "Leave", IDServeur: serveurID } });
         const msg1 = leaveMessageConfig.Part1;
         const Mention = leaveMessageConfig.Mention;
         let msg2 = leaveMessageConfig.Part2;
@@ -65,7 +67,7 @@ module.exports = async (client, member) => {
 
         let leaveFooter = `Nous ne sommes plus que ${memberCount} membres !`
 
-        const leaveFooterConfig = await Msg.findOne({ where: { Infos: "LeaveFooter" } });
+        const leaveFooterConfig = await Msg.findOne({ where: { Infos: "LeaveFooter", IDServeur: serveurID } });
         const footer1 = leaveFooterConfig.Part1;
         const count = leaveFooterConfig.Mention;
         let footer2 = leaveFooterConfig.Part2;
@@ -113,7 +115,7 @@ module.exports = async (client, member) => {
             leaveChannel.send({ embeds: [leaveEmbed], files: [attachment] });
         } catch (err) {
             try {
-                checkWelcomeLeave.update({ Valeur: false }, { where: { Module: "WelcomeLeave" } });
+                checkWelcomeLeave.update({ Valeur: false }, { where: { Module: "WelcomeLeave", IDServeur: serveurID } });
                 if(orisaphir === null || orisaphir === undefined) {
                     return console.log(`Erreur : ${err}`);
                 }
@@ -131,10 +133,10 @@ module.exports = async (client, member) => {
         }
     }
 
-    const Stats = await Admins.findOne({ where: { Module: "stats" } });
+    const Stats = await Admins.findOne({ where: { Module: "stats", IDServeur: serveurID } });
     if (Stats.Valeur === false) return;
-    const StatsMemberConfig = await Infos.findOne({ where: { Infos: "statsmembers" } });
-    const StatsBotsConfig = await Infos.findOne({ where: { Infos: "statsbots" } });
+    const StatsMemberConfig = await Infos.findOne({ where: { Infos: "statsmembers", IDServeur: serveurID } });
+    const StatsBotsConfig = await Infos.findOne({ where: { Infos: "statsbots", IDServeur: serveurID } });
 
     if (StatsMemberConfig.Valeur === true) {
         try {
@@ -145,7 +147,7 @@ module.exports = async (client, member) => {
             updateMembers(member.guild)
         } catch (err) {
             try {
-                StatsMemberConfig.update({ Valeur: false }, { where: { Module: "statsmembers" } });
+                StatsMemberConfig.update({ Valeur: false }, { where: { Module: "statsmembers", IDServeur: serveurID } });
                 if(orisaphir === null || orisaphir === undefined) {
                     return console.log(`Erreur : ${err}`);
                 }
@@ -172,7 +174,7 @@ module.exports = async (client, member) => {
             updateBots(member.guild)
         } catch (err) {
             try {
-                StatsBotsConfig.update({ Valeur: false }, { where: { Module: "statsbots" } });
+                StatsBotsConfig.update({ Valeur: false }, { where: { Module: "statsbots", IDServeur: serveurID } });
                 if(orisaphir === null || orisaphir === undefined) {
                     return console.log(`Erreur : ${err}`);
                 }

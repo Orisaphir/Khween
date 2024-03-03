@@ -24,6 +24,7 @@ module.exports = {
         }
         let level = null;
         let role = null;
+        const IDServeur = message.guild.id;
         try {
             if (message.options.getInteger('niveau')) {
                 level = message.options.getInteger('niveau');
@@ -31,7 +32,6 @@ module.exports = {
             if (message.options.getRole('role')) {
                 role = message.options.getRole('role');
             }
-            const IDServeur = message.guild.id;
 
             if (level === null && role === null) return message.reply({ content: `Tu dois spécifier un niveau ou un rôle !`, ephemeral: true });
             if (level !== null && role !== null) {
@@ -77,7 +77,7 @@ module.exports = {
             if (levels) {
                 const Membres = await message.guild.members.fetch();
                 Membres.forEach(async (membre) => {
-                    const searchMembre = await Level.findOne({ where: { IDMembre: membre.id } });
+                    const searchMembre = await Level.findOne({ where: { IDMembre: membre.id }, IDServeur: IDServeur });
                     if (searchMembre) {
                         const levelMembre = await searchMembre.get("level");
                         if (levelMembre >= level) {

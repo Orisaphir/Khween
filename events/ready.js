@@ -1,10 +1,13 @@
 const loadSlashCommands = require("../loaders/loadSlash")
 const { ActivityType } = require("discord.js")
 const { Khween } = require("../app.js")
+const { progress } = require("../index.js")
 
 module.exports = async client => {
 
     await loadSlashCommands(client)
+
+    console.log(`\nChargement et vérification des bases de données...`);
 
     const Emojis = require("../modules/Emojis");
     await Emojis.sync();
@@ -13,7 +16,8 @@ module.exports = async client => {
     await Level.sync();
     
     const Admins = require("../modules/Admin")
-    await Admins.sync();
+    await Admins.sync({ alter: true });
+    progress(0.25)
     const count = await Admins.count();
     if (count === 0) {
         await Admins.bulkCreate([
@@ -38,7 +42,8 @@ module.exports = async client => {
     
 
     const Infos = require("../modules/Infos")
-    await Infos.sync()
+    await Infos.sync({ alter: true })
+    progress(0.5)
     const count2 = await Infos.count();
     if (count2 === 0) {
         await Infos.bulkCreate([
@@ -66,7 +71,8 @@ module.exports = async client => {
     await Infos.findOrCreate({ where: { Infos: 'levelup' }, defaults: { Valeur: false } });
     
     const Msg = require("../modules/Msg")
-    await Msg.sync()
+    await Msg.sync({ alter: true })
+    progress(0.75)
     const count3 = await Msg.count();
     if (count3 === 0) {
         await Msg.bulkCreate([
@@ -99,7 +105,8 @@ module.exports = async client => {
     await Msg.findOrCreate({ where: { Infos: 'NewRole' } });
 
     const HistoData = require("../modules/HistoData")
-    await HistoData.sync();
+    await HistoData.sync({ alter: true });
+    progress(1)
     const count4 = await HistoData.count();
     if (count4 === 0) {
         await HistoData.bulkCreate([
@@ -127,6 +134,8 @@ module.exports = async client => {
 
     const Reward = require("../modules/Reward")
     await Reward.sync();
+
+    console.log(`\nBases de données chargées et vérifiées !\n\n`);
 
     console.log('Khween est prête !');
 

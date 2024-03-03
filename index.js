@@ -10,7 +10,6 @@ const intents = new Discord.IntentsBitField(3276799);
 
 //Discord Client
 global.client = new Discord.Client({intents});
-client.commands = new Discord.Collection
 
 //Loading
 const loadCommands = require("./loaders/loadCommands");
@@ -119,6 +118,7 @@ function progress(percent = 0) {
     put('\r                                       ');
     put('\r[' + buff + '] ' + Math.round(percent * 100).toString() + '%');
 }
+exports.progress = progress;
 
 async function unzip(zip_file_path, to_directory) {
     try {

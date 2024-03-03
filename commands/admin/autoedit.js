@@ -25,6 +25,24 @@ module.exports = {
     async run(_, message) {
         const Type = message.options.getString("type");
         const IDBrut = message.options.getString("id");
+        const ServeurID = message.guild.id;
+
+        await HistoData.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await HistoData.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+        await Infos.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Infos.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+        await Admins.findOne({ where: { IDServeur: null } }).then(async (data) => {
+            if (data) {
+                await Admins.update({ IDServeur: ServeurID }, { where: { IDServeur: null } });
+            }
+        });
+
         let ID = IDBrut;
         let IDChannel = null;
         if (message.options.getString("channel")) {
@@ -47,10 +65,10 @@ module.exports = {
 
         try {
             if (Type === "verify") {
-                const HistoVerify = await HistoData.findOne({ where: { Infos: "Verify" } });
-                const verifychannelInfos = await Infos.findOne({ where: { Infos: "verifychannel" } });
-                const verifyroleInfos = await Infos.findOne({ where: { Infos: "verifyrole" } });
-                const adminInfos = await Admins.findOne({ where: { Module: "verify" } });
+                const HistoVerify = await HistoData.findOne({ where: { Infos: "Verify", IDServeur: ServeurID } });
+                const verifychannelInfos = await Infos.findOne({ where: { Infos: "verifychannel", IDServeur: ServeurID } });
+                const verifyroleInfos = await Infos.findOne({ where: { Infos: "verifyrole", IDServeur: ServeurID } });
+                const adminInfos = await Admins.findOne({ where: { Module: "verify", IDServeur: ServeurID } });
                 if (verifyroleInfos.Valeur === false) return message.reply({ content: "Le module est désactivé, veuillez configurer le Rôle qui sera donné avec la commande /verifyconfig", ephemeral: true });
                 if (adminInfos.Valeur === false) return message.reply({ content: "Le module est désactivé, veuillez l'activer avec la commande /setup", ephemeral: true });
 
@@ -61,17 +79,17 @@ module.exports = {
                 const CheckRole = await message.guild.roles.cache.get(verifyrole);
 
                 if (!CheckRole) {
-                    await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "verifyrole" } });
+                    await Infos.update({ DiscordID: null, Valeur: false }, { where: { Infos: "verifyrole", IDServeur: ServeurID } });
                     return message.reply({ content: "Le rôle de vérification n'existe plus ou est introuvable. Merci de le reconfigurer avec la commande /verifyconfig !", ephemeral: true });
                 }
 
                 if (HistoMessage !== null && HistoMessage !== messageCheck.id) return message.reply({ content: "Ce n'est pas mon message de vérification !", ephemeral: true });
 
                 if (HistoChannel === null || HistoMessage === null) {
-                    await HistoData.update({ Channel: verifychannel, Message: messageCheck.id }, { where: { Infos: "Verify" } });
+                    await HistoData.update({ Channel: verifychannel, Message: messageCheck.id }, { where: { Infos: "Verify", IDServeur: ServeurID } });
                 }
 
-                const data = await Msg.findOne({ where: { Infos: "Verify" } });
+                const data = await Msg.findOne({ where: { Infos: "Verify", IDServeur: ServeurID } });
                 let Part1 = data.get("Part1");
                 if (Part1 === null) return message.reply({ content: "Je n'ai aucun edit possible.", ephemeral: true });
                 let Part2 = data.get("Part2");
@@ -88,9 +106,9 @@ module.exports = {
                 await messageCheck.edit({ embeds: [embed], components: [button] });
             }
             if (Type === "ticket") {
-                const openticketInfos = await Infos.findOne({ where: { Infos: "openticket" } });
-                const adminInfos = await Admins.findOne({ where: { Module: "ticket" } });
-                const HistoTicket = await HistoData.findOne({ where: { Infos: "Ticket" } });
+                const openticketInfos = await Infos.findOne({ where: { Infos: "openticket", IDServeur: ServeurID } });
+                const adminInfos = await Admins.findOne({ where: { Module: "ticket", IDServeur: ServeurID } });
+                const HistoTicket = await HistoData.findOne({ where: { Infos: "Ticket", IDServeur: ServeurID } });
                 if (openticketInfos.Valeur === false) return message.reply({ content: "Le module est désactivé, veuillez configurer le Channel où sera envoyé le Ticket avec la commande /config", ephemeral: true });
                 if (adminInfos.Valeur === false) return message.reply({ content: "Le module est désactivé, veuillez l'activer avec la commande /setup", ephemeral: true });
 
@@ -100,10 +118,10 @@ module.exports = {
                 if (HistoMessage !== null && HistoMessage !== messageCheck.id) return message.reply({ content: "Ce n'est pas mon message de ticket !", ephemeral: true });
 
                 if (HistoChannel === null || HistoMessage === null) {
-                    await HistoData.update({ Channel: openticket, Message: messageCheck.id }, { where: { Infos: "Ticket" } });
+                    await HistoData.update({ Channel: openticket, Message: messageCheck.id }, { where: { Infos: "Ticket", IDServeur: ServeurID } });
                 }
 
-                const data = await Msg.findOne({ where: { Infos: "Ticket" } });
+                const data = await Msg.findOne({ where: { Infos: "Ticket", IDServeur: ServeurID } });
                 let Part1 = data.get("Part1");
                 if (Part1 === null) return message.reply({ content: "Je n'ai aucun edit possible.", ephemeral: true });
                 let Part2 = data.get("Part2");

@@ -6,6 +6,7 @@ module.exports = async (client, reaction, user) => {
 
     const messageID = message.id;
     const emojiData = reaction.emoji;
+    const serveurID = message.guild.id;
 
     //On vérifie que l'émoji est custom ou pas
     let emojiName = "";
@@ -22,7 +23,7 @@ module.exports = async (client, reaction, user) => {
     }
 
     // On cherche la ligne avec cet emoji et ce message
-    const search = await Emojis.findOne({ where: { IDMessage: messageID, IDemoji:emojiName} });
+    const search = await Emojis.findOne({ where: { IDMessage: messageID, IDemoji:emojiName, IDServeur: serveurID } });
 
     // Si rien de trouvé, osef, on passe
     if (!search)

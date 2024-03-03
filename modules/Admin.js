@@ -8,9 +8,12 @@ const sequelize = new Sequelize('database', 'username', 'password', {
 });
 
 const Admins = sequelize.define('admins', {
+    IDServeur: {
+        type: Sequelize.STRING,
+        allowNull: true,
+    },
     Module: {
         type: Sequelize.STRING,
-        unique: true,
         allowNull: false,
     },
     Valeur: {

@@ -8,6 +8,10 @@ const sequelize = new Sequelize('database', 'username', 'password', {
 });
 
 const Msg = sequelize.define('msg', {
+    IDServeur: {
+        type: Sequelize.STRING,
+        allowNull: true,
+    },
     Infos: {
         type: Sequelize.STRING,
         unique: true,
