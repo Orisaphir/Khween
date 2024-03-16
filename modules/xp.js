@@ -10,7 +10,7 @@ const sequelize = new Sequelize('database', 'username', 'password', {
 const Level = sequelize.define('level', {
     IDMembre: {
         type: Sequelize.STRING,
-        unique: true,
+        unique: false,
     },
     IDServeur: Sequelize.STRING,
     xp: {

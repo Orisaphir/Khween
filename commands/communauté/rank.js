@@ -63,7 +63,13 @@ module.exports = {
         const nextLVL = Math.floor(level * level * 50);
 
         const allLevels = await Level.findAll({ where: { IDServeur: serveurID } });
-        const sortedLevels = allLevels.sort((a, b) => b.xp - a.xp);
+        const sortedLevels = allLevels.sort((a, b) => {
+            if (a.level === b.level) {
+                return b.xp - a.xp;
+            } else {
+                return b.level - a.level;
+            }
+        });
         const rank = sortedLevels.findIndex((lvl) => lvl.IDMembre === user.id) + 1;
 
         let RankMsg = `${rank}ème au classement !`

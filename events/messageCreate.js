@@ -1,17 +1,44 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const Ori = `421416465430741003`
 const Level = require("../modules/xp")
 const Admins = require("../modules/Admin")
 const Msg = require("../modules/Msg")
 const Infos = require("../modules/Infos")
 const Reward = require("../modules/Reward")
+const BLChannels = require("../modules/BlackListChannels")
+const { Khween } = require("../app")
 
 module.exports = async (client, message, member) => {
 
     const serveurID = message.guild.id;
+    const isBL = await BLChannels.findOne({ where: { IDServeur: serveurID, Channel: message.channel.id } });
 
     if (message.author.bot) return;
     if (message.channel.type === "dm") return;
+
+    if (message.content.startsWith("%lock")) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageChannels)) return
+        if (!message.guild.roles.everyone.permissionsIn(message.channel.id).has(PermissionFlagsBits.SendMessages)) return
+        await message.channel.permissionOverwrites.set([
+            {
+                id: message.guild.roles.everyone,
+                deny: [PermissionFlagsBits.SendMessages]
+            }
+        ])
+        return message.channel.send("Salon verrouillé");
+    }
+    if (message.content.startsWith("%unlock")) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageChannels)) return
+        if (message.guild.roles.everyone.permissionsIn(message.channel.id).has(PermissionFlagsBits.SendMessages)) return
+        await message.channel.permissionOverwrites.set([
+            {
+                id: message.guild.roles.everyone,
+                allow: [PermissionFlagsBits.SendMessages]
+            }
+        ])
+        return message.channel.send("Salon déverrouillé");
+    }
+
     const adminInfos = await Admins.findOne({ where: { Module: "xp" }, IDServeur: serveurID });
     if (adminInfos.Valeur === false) return;
 
@@ -55,6 +82,7 @@ module.exports = async (client, message, member) => {
     }
 
     if (!search) {
+        if (isBL) return console.log(`Le salon ${message.channel.name} est bloqué pour l'XP !`);
 
         try {
             let champs = {
@@ -154,6 +182,23 @@ module.exports = async (client, message, member) => {
             }
         };
     } else {
+        if (isBL) return
+        const lastUpdate = search.get("updatedAt");
+        let date = "";
+        let heure = "";
+        if (typeof lastUpdate === "string") {
+            date = lastUpdate.split(" ")[1] + " " + lastUpdate.split(" ")[2] + " " + lastUpdate.split(" ")[3];
+            heure = lastUpdate.split(" ")[4];
+        } else {
+            date = String(lastUpdate).split(" ")[1] + " " + String(lastUpdate).split(" ")[2] + " " + String(lastUpdate).split(" ")[3];
+            heure = String(lastUpdate).split(" ")[4];
+        }
+        let getCorrectDate = new Date(`${date} ${heure}`);
+        let LastUpdateTimestamp = getCorrectDate.getTime();
+        let TimestampNow = new Date().getTime();
+        let diff = TimestampNow - LastUpdateTimestamp;
+        let diffSecondes = diff / 1000;
+        if (diffSecondes < Khween.cooldown) return;
         const newxp = ge
         const xplevel = level * level * 50
         let xp = await search.get("xp");

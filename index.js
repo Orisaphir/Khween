@@ -22,31 +22,35 @@ if (!fs.existsSync('./config.json')) {
         "ACTIVITY_TYPE": "Playing",
         "ACTIVITY_NAME": "modérer",
         "ACTIVITY_STATUS": "online",
-        "ACTIVITY_URL": null
+        "ACTIVITY_URL": null,
+        "MASTER_ID": true,
+        "COOLDOWN": "0"
     }, null, 2));
     console.log('Fichier config.json créé.');
 }
 
 // Vérifier que le fichier config.json a les bonnes valeurs
 const configCheck = require('./config.json');
-if (!configCheck.ACTIVITY_TYPE || !configCheck.ACTIVITY_NAME || !configCheck.ACTIVITY_STATUS) {
+if (!configCheck.ACTIVITY_TYPE || !configCheck.ACTIVITY_NAME || !configCheck.ACTIVITY_STATUS || !configCheck.MASTER_ID || !configCheck.COOLDOWN) {
     const token = configCheck.BOT_TOKEN;
+    let master = true;
+    if (configCheck.MASTER_ID) {
+        master = configCheck.MASTER_ID;
+    }
     fs.rmSync('./config.json');
     fs.writeFileSync('./config.json', JSON.stringify({
         "BOT_TOKEN": token,
         "ACTIVITY_TYPE": "Playing",
         "ACTIVITY_NAME": "modérer",
         "ACTIVITY_STATUS": "online",
-        "ACTIVITY_URL": null
+        "ACTIVITY_URL": null,
+        "MASTER_ID": master,
+        "COOLDOWN": "0"
     }, null, 2));
     console.log('\n\nFichier config.json mis à jour. Veuillez redémarrer Khween.\n');
     process.exit(1);
 }
 
-const readline = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
 const config = require("./config.json");
 
 //Music
@@ -82,6 +86,11 @@ async function init() {
     Khween.activity_name = config.ACTIVITY_NAME;
     Khween.activity_status = config.ACTIVITY_STATUS;
     Khween.activity_url = config.ACTIVITY_URL;
+    Khween.cooldown = config.COOLDOWN;
+    if (config.MASTER_ID === '' || config.MASTER_ID === true) {
+        await getMaster();
+    }
+    Khween.master_id = config.MASTER_ID;
     put('\nRecherche de mises à jour...\n')
     await shouldUpdate();
     if (await shouldUpdate() === true) {
@@ -97,7 +106,6 @@ async function init() {
     }
     put('\nConnexion à Discord...\n');
     await loginWithRetry();
-    readline.close();
     client.commands = [];
     put('\n\nChargement des commandes...')
     loadCommands(client);
@@ -112,6 +120,7 @@ function quit(code = ErreurCode.None) {
 function put(text) {
     console.log(text);
 }
+exports.put = put;
 
 function progress(percent = 0) {
     let buff = ''.padStart(Math.round(percent * 35), '#').padEnd(35, ' ');
@@ -262,6 +271,7 @@ async function update() {
 }
 
 async function getToken() {
+    let readline = await readlineOpen();
     while (true) {
         const token = await new Promise((resolve) => {
             readline.question('Token: ', token => {
@@ -272,17 +282,45 @@ async function getToken() {
                     let config = require('./config.json');
                     config.BOT_TOKEN = token;
                     fs.writeFileSync('./config.json', JSON.stringify(config, null, 2));
-                    console.log('Token enregistré.');
+                    console.log('Token enregistré.\n');
                     resolve(token);
                 }
             });
         });
 
         if (token) {
+            await readlineClose(readline);
             break;
         }
     }
 }
+
+async function getMaster() {
+    let readline = await readlineOpen();
+    while (true) {
+        const master = await new Promise((resolve) => {
+            readline.question('ID du propriétaire du Bot: ', master => {
+                if (master.trim() === '') {
+                    console.log('Veuillez entrer un ID valide.');
+                    resolve(null);
+                } else {
+                    let config = require('./config.json');
+                    config.MASTER_ID = master;
+                    fs.writeFileSync('./config.json', JSON.stringify(config, null, 2));
+                    console.log('ID enregistré.\n');
+                    resolve(master);
+                }
+            });
+        });
+
+        if (master) {
+            await readlineClose(readline);
+            break;
+        }
+    }
+
+}
+exports.getMaster = getMaster;
 
 async function loginWithRetry() {
     let loggedIn = false;
@@ -298,3 +336,45 @@ async function loginWithRetry() {
         }
     }
 }
+
+async function searchMaster() {
+    let masterFound = false;
+    const botGuilds = client.guilds.cache;
+    while (!masterFound) {
+        for (const [id, guild] of botGuilds) {
+            try {
+                const member = await guild.members.fetch(Khween.master_id);
+                if (member) {
+                    if (member.user.bot === false) {
+                        put(`\x1b[32m${member.user.globalName}\x1b[0m a été trouvé dans le serveur \x1b[32m${guild.name}.\x1b[0m\n`);
+                        put('Propriétaire du bot trouvé.\n\n');
+                        masterFound = true;
+                    } else {
+                        throw new Error('bot');
+                    }
+                }
+            } catch (error) {
+                if (error.message === 'bot') {
+                    put('Erreur: Le propriétaire du bot ne peut pas être un bot. Veuillez entrer un nouvel ID.\n\x1b[33mLe bot et le propriétaire doivent être dans le même serveur\x1b[0m');
+                } else {
+                    put('Erreur: Impossible de trouver le propriétaire du bot. Veuillez entrer un nouvel ID.\n\x1b[33mLe bot et le propriétaire doivent être dans le même serveur\x1b[0m');
+                }
+                await getMaster();
+                Khween.master_id = config.MASTER_ID;
+            }
+        }
+    }
+}
+exports.searchMaster = searchMaster;
+async function readlineOpen(){
+    const readline = require('readline').createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    return readline;
+}
+exports.readlineOpen = readlineOpen;
+async function readlineClose(readline){
+    readline.close();
+}
+exports.readlineClose = readlineClose;

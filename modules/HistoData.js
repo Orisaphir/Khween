@@ -14,7 +14,7 @@ const HistoData = sequelize.define('histodata', {
     },
     Infos: {
         type: Sequelize.STRING,
-        unique: true,
+        unique: false,
         allowNull: false,
     },
     Channel: {

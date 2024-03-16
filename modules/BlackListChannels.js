@@ -4,27 +4,19 @@ const sequelize = new Sequelize('database', 'username', 'password', {
     dialect: 'sqlite',
     logging: false,
     // SQLite only
-    storage: './bdd/infos.sqlite',
+    storage: './bdd/blchannels.sqlite',
 });
 
-const Infos = sequelize.define('infos', {
+const BLChannels = sequelize.define('blchannels', {
     IDServeur: {
         type: Sequelize.STRING,
         allowNull: true,
     },
-    Infos: {
+    Channel: {
         type: Sequelize.STRING,
+        allowNull: false,
         unique: false,
-        allowNull: false,
-    },
-    Valeur: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-    },
-    DiscordID: {
-        type: Sequelize.STRING,
-        allowNull: true,
     },
 });
 
-module.exports = Infos;
+module.exports = BLChannels;

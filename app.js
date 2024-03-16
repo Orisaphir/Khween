@@ -8,9 +8,11 @@ class Config {
     activity_name = ''
     activity_status = ''
     activity_url = ''
+    master_id = ''
+    cooldown = ''
 }
 
-class KhweenApp {Ò
+class KhweenApp {
     package = new Package();
     config = new Config();
 

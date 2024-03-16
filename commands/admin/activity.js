@@ -1,5 +1,6 @@
 const { PermissionFlagsBits, SlashCommandBuilder, ActivityType } = require('discord.js');
 const fs = require('fs');
+const { Khween } = require('../../app.js');
 const Ori = `<@421416465430741003>`;
 
 module.exports = {
@@ -27,6 +28,7 @@ module.exports = {
         .addStringOption((options) => options.setName("url").setDescription('URL du stream à afficher').setRequired(false)),
 
     async run(_, message) {
+        if (message.user.id !== Khween.master_id) return message.reply({ content: "Vous n'avez pas la permission d'utiliser cette commande.", ephemeral: true });
         const Type = message.options.getString('type');
         const Message = message.options.getString('message');
         let Status = "online";

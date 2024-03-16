@@ -15,6 +15,7 @@ const Admins = sequelize.define('admins', {
     Module: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: false,
     },
     Valeur: {
         type: Sequelize.BOOLEAN,

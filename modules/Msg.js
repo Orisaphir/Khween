@@ -14,7 +14,7 @@ const Msg = sequelize.define('msg', {
     },
     Infos: {
         type: Sequelize.STRING,
-        unique: true,
+        unique: false,
         allowNull: false,
     },
     Part1: {

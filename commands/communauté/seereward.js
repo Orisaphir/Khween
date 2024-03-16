@@ -1,6 +1,5 @@
-const { PermissionFlagsBits, SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, EmbedBuilder, ButtonStyle, time, User } = require("discord.js");
+const { PermissionFlagsBits, SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, EmbedBuilder, ButtonStyle } = require("discord.js");
 const Reward = require("../../modules/Reward");
-const reward = require("./reward");
 let RewardInfo = [];
 
 module.exports = {

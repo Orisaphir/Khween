@@ -1,7 +1,7 @@
 const loadSlashCommands = require("../loaders/loadSlash")
 const { ActivityType } = require("discord.js")
 const { Khween } = require("../app.js")
-const { progress } = require("../index.js")
+const { progress, searchMaster, getMaster, put } = require("../index.js")
 
 module.exports = async client => {
 
@@ -106,7 +106,7 @@ module.exports = async client => {
 
     const HistoData = require("../modules/HistoData")
     await HistoData.sync({ alter: true });
-    progress(1)
+    progress(0.9)
     const count4 = await HistoData.count();
     if (count4 === 0) {
         await HistoData.bulkCreate([
@@ -135,9 +135,15 @@ module.exports = async client => {
     const Reward = require("../modules/Reward")
     await Reward.sync();
 
-    console.log(`\nBases de données chargées et vérifiées !\n\n`);
+    const BLChannels = require("../modules/BlackListChannels")
+    await BLChannels.sync();
 
-    console.log('Khween est prête !');
+    progress(1)
+    put(`\nBases de données chargées et vérifiées !\n\n`);
+    put('\nRecherche du propriétaire du bot...\n');
+    await searchMaster();
+
+    put('Khween est prête !');
 
     let activityType = ""
     let activity_url = null;
