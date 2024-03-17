@@ -270,7 +270,10 @@ module.exports = async (client, message, member) => {
 
                 Level.update({ level: resultLevel }, { where: { IDMembre: MembreID, IDServeur: serveurID } });
                 Level.update({ xp: 0 }, { where: { IDMembre: MembreID, IDServeur: serveurID } });
-                levelUp.send(levelmsg)
+                const isLevelUpSend = await Admins.findOne({ where: { Module: "levelup", IDServeur: serveurID } });
+                if (isLevelUpSend.Valeur === true) {
+                    levelUp.send(levelmsg);
+                }
                 const reward = await Reward.findOne({ where: { IDServeur: ServeurID, Level: resultLevel, IDServeur: serveurID } });
                 if (reward) {
                     const role = message.guild.roles.cache.get(reward.IDRole);
