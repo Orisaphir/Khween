@@ -16,14 +16,16 @@ module.exports = async (client, message) => {
 
     const LogChannel = await Infos.findOne({ where: { Infos: "logs", IDServeur: serveurID } });
     const LogOn = await Admins.findOne({ where: { Module: "logs", IDServeur: serveurID } });
-    const fetchLog = await message.guild.fetchAuditLogs({
-        limit: 1,
+    let fetchLog = await message.guild.fetchAuditLogs({
         type: AuditLogEvent.MessageDelete
     });
-    const logmember = fetchLog.entries.first();
-    const { executorId } = logmember;
-    const executoruser = await message.guild.members.fetch(executorId);
-    const executor = `<@${executoruser.user.id}>`;
+    let logmember = fetchLog.entries.first();
+    let { executorId } = logmember;
+    let executoruser = await message.guild.members.fetch(executorId);
+    let executor = `<@${executoruser.user.id}>`;
+    if (logmember.createdTimestamp < Date.now() - 1500) {
+        executor = `${message.author}`;
+    }
     if (LogOn.Valeur === true && LogChannel.DiscordID !== null) {
         const log = message.guild.channels.cache.get(LogChannel.DiscordID);
         const embed = new EmbedBuilder()
