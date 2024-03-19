@@ -8,6 +8,8 @@ const Ori = `421416465430741003`
 module.exports = async (client, member) => {
 
     const serveurID = member.guild.id;
+    const WelcomeLeave = await Admins.findOne({ where: { Module: "WelcomeLeave", IDServeur: serveurID } });
+    const WelcomeLeaveConfig = await Infos.findOne({ where: { Infos: "WelcomeLeave", IDServeur: serveurID } });
 
     let orisaphir = null;
         try {
@@ -17,12 +19,8 @@ module.exports = async (client, member) => {
         catch (err) {
             console.log(`Erreur lors de la récupération de Ori : ${err}`);
         }
-    
-    if (!member.user.bot) {
-        const WelcomeLeave = await Admins.findOne({ where: { Module: "WelcomeLeave", IDServeur: serveurID } });
-        if (WelcomeLeave.Valeur === false) return;
-        const WelcomeLeaveConfig = await Infos.findOne({ where: { Infos: "WelcomeLeave", IDServeur: serveurID } });
-        if (WelcomeLeaveConfig.Valeur === false) return;
+
+    if (!member.user.bot && WelcomeLeave.Valeur === true && WelcomeLeaveConfig.Valeur === true) {
 
         const welcomeChannel = member.guild.channels.cache.get(WelcomeLeaveConfig.DiscordID)
         

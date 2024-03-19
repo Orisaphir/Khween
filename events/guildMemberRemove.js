@@ -9,6 +9,8 @@ const Ori = `421416465430741003`
 module.exports = async (client, member) => {
 
     const serveurID = member.guild.id;
+    const checkWelcomeLeave = await Admins.findOne({ where: { Module: "WelcomeLeave", IDServeur: serveurID } });
+    const checkWelcomeLeaveConfig = await Infos.findOne({ where: { Infos: "WelcomeLeave", IDServeur: serveurID } });
 
     let orisaphir = null;
         try {
@@ -25,11 +27,7 @@ module.exports = async (client, member) => {
         await Level.destroy({ where: { IDMembre: MembreID, IDServeur: serveurID } });
     }
     
-    if (!member.user.bot) {
-        const checkWelcomeLeave = await Admins.findOne({ where: { Module: "WelcomeLeave", IDServeur: serveurID } });
-        if (checkWelcomeLeave.Valeur === false) return;
-        const checkWelcomeLeaveConfig = await Infos.findOne({ where: { Infos: "WelcomeLeave", IDServeur: serveurID } });
-        if (checkWelcomeLeaveConfig.Valeur === false) return;
+    if (!member.user.bot && checkWelcomeLeave.Valeur === true && checkWelcomeLeaveConfig.Valeur === true) {
 
         const leaveChannel = member.guild.channels.cache.get(checkWelcomeLeaveConfig.DiscordID)
         
