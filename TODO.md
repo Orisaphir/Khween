@@ -36,7 +36,7 @@ Rajouter une commande pour voir les rewards actuels et une commande /top pour vo
 ### [x] V0.5.4
 Rajouter une commande pour instaurer un cooldown à la génération d'xp/message, rajouter une commande pour Blacklist des channels pour l'xp, rajouter les messages supprimés dans les logs, rajouter une commande %lock et %unlock pour gérer les salons textuels
 
-### [ ] v0.6.0
+### [x] v0.6.0
 Faire un starboard
 
 ### [ ] v0.6.1
@@ -46,7 +46,7 @@ Faire une commande /embed
 Pour la commande /rr, faire en sorte que l'utilisateur puisse indiquer le lien du message et que le bot récupère l'id tout seul
 
 ### [ ] v0.6.3
-Faire en sorte que les réactions sur les messages de la BDD reactionrole soit retirées lors des différents events qui destroy les lignes de la BDD
+Faire en sorte que les réactions sur les messages de la BDD reactionrole soit retirées lors des différents events qui destroy les lignes de la BDD (Osef un peu ?)
 
 ### ...
 

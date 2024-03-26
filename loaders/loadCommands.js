@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { warnPut, quit } = require("../index")
 
 module.exports = async client => {
 
@@ -13,6 +14,7 @@ module.exports = async client => {
         });
     }
     catch (e) {
-        console.log(`Erreur lors du chargement des commandes: ${e}`);
+        warnPut(`Erreur lors du chargement des commandes: ${e}`);
+        quit(ErreurCode.CriticalError);
     }
 }

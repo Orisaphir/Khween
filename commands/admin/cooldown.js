@@ -1,6 +1,5 @@
 const { PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
-const fs = require('fs');
-const { Khween } = require('../../app.js');
+const Cooldown = require('../../modules/Cooldown');
 
 module.exports = {
     
@@ -16,13 +15,15 @@ module.exports = {
                 .setRequired(true)),
     
     async run(_, message) {
-        const Cooldown = message.options.getInteger('cooldown');
-        let config = require('../../config.json');
+        const CD = message.options.getInteger('cooldown');
+        const CDConfig = await Cooldown.findOne({ where: { IDServeur: message.guild.id } });
     
         try {
-            config.COOLDOWN = Cooldown;
-            fs.writeFileSync("./config.json", JSON.stringify(config, null, 2));
-            Khween.cooldown = Cooldown;
+            if (!CDConfig) {
+                await Cooldown.create({ IDServeur: message.guild.id, cooldown: CD });
+            } else {
+                await Cooldown.update({ cooldown: CD }, { where: { IDServeur: message.guild.id } });
+            }
             message.reply({ content: `Le cooldown a été modifié avec succès !`, ephemeral: true });
         } catch (error) {
             console.error(error);

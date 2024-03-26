@@ -1,5 +1,6 @@
 const { Discord, Routes, SlashCommandBuilder, ReactionUserManager } = require("discord.js");
 const { REST } = require("@discordjs/rest")
+const { greenPut } = require("../index")
 
 module.exports = async client => {
 
@@ -16,5 +17,5 @@ module.exports = async client => {
     const rest = new REST({version: "10"}).setToken(client.token)
 
     await rest.put(Routes.applicationCommands(client.user.id), {body: commands})
-    console.log("Les commandes slashs sont prêtes\n")
+    greenPut("Les commandes slashs sont prêtes\n")
 }

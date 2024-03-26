@@ -6,7 +6,7 @@ const Msg = require("../modules/Msg")
 const Infos = require("../modules/Infos")
 const Reward = require("../modules/Reward")
 const BLChannels = require("../modules/BlackListChannels")
-const { Khween } = require("../app")
+const Cooldown = require("../modules/Cooldown")
 
 module.exports = async (client, message, member) => {
 
@@ -193,12 +193,18 @@ module.exports = async (client, message, member) => {
             date = String(lastUpdate).split(" ")[1] + " " + String(lastUpdate).split(" ")[2] + " " + String(lastUpdate).split(" ")[3];
             heure = String(lastUpdate).split(" ")[4];
         }
+        let CD = await Cooldown.findOne({ where: { IDServeur: serveurID } });
+        if (!CD) {
+            CD = 0;
+        } else {
+            CD = CD.get("cooldown");
+        }
         let getCorrectDate = new Date(`${date} ${heure}`);
         let LastUpdateTimestamp = getCorrectDate.getTime();
         let TimestampNow = new Date().getTime();
         let diff = TimestampNow - LastUpdateTimestamp;
         let diffSecondes = diff / 1000;
-        if (diffSecondes < Khween.cooldown) return;
+        if (diffSecondes < CD) return
         const newxp = ge
         const xplevel = level * level * 50
         let xp = await search.get("xp");
