@@ -182,6 +182,7 @@ module.exports = async (client, message, member) => {
             }
         };
     } else {
+        const gendef = ge
         if (isBL) return
         const lastUpdate = search.get("updatedAt");
         let date = "";
@@ -205,7 +206,7 @@ module.exports = async (client, message, member) => {
         let diff = TimestampNow - LastUpdateTimestamp;
         let diffSecondes = diff / 1000;
         if (diffSecondes < CD) return
-        const newxp = ge
+        const newxp = gendef
         const xplevel = level * level * 50
         let xp = await search.get("xp");
         const xpavant = Number(xp)
