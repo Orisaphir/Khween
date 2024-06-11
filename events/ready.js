@@ -27,21 +27,29 @@ module.exports = async client => {
             { Module: 'ticket', Valeur: false },
             { Module: 'xp', Valeur: false },
             { Module: 'verify', Valeur: false},
-            { Module: 'logs', Valeur: false},
+            { Module: 'MessageLogs', Valeur: false},
+            { Module: 'VocLogs', Valeur: false},
             { Module: 'WelcomeLeave', Valeur: false},
             { Module: 'stats', Valeur: false},
             { Module: 'levelup', Valeur: false},
             { Module: 'NewRole', Valeur: false}
         ]);
     }
-    await Admins.findOrCreate({ where: { Module: 'ticket' }, defaults: { Valeur: false } });
-    await Admins.findOrCreate({ where: { Module: 'xp' }, defaults: { Valeur: false } });
-    await Admins.findOrCreate({ where: { Module: 'verify' }, defaults: { Valeur: false } });
-    await Admins.findOrCreate({ where: { Module: 'logs' }, defaults: { Valeur: false } });
-    await Admins.findOrCreate({ where: { Module: 'WelcomeLeave' }, defaults: { Valeur: false } });
-    await Admins.findOrCreate({ where: { Module: 'stats' }, defaults: { Valeur: false } });
-    await Admins.findOrCreate({ where: { Module: 'levelup' }, defaults: { Valeur: true } });
-    await Admins.findOrCreate({ where: { Module: 'NewRole' }, defaults: { Valeur: true } });
+    const AdminArray = [
+        'ticket',
+        'xp',
+        'verify',
+        'MessageLogs',
+        'VocLogs',
+        'WelcomeLeave',
+        'stats',
+        'levelup',
+        'NewRole'
+    ];
+
+    for (let admin of AdminArray) {
+        await Admins.findOrCreate({ where: { Module: admin }, defaults: { Valeur: false } });
+    }
     
 
     const Infos = require("../modules/Infos")
@@ -55,23 +63,31 @@ module.exports = async client => {
             { Infos: 'archiveticket', Valeur: false },
             { Infos: 'verifychannel', Valeur: false },
             { Infos: 'verifyrole', Valeur: false },
-            { Infos: 'logs', Valeur: false},
+            { Infos: 'MessageLogs', Valeur: false},
+            { Infos: 'VocLogs', Valeur: false},
             { Infos: 'WelcomeLeave', Valeur: false},
             { Infos: 'statsmembers', Valeur: false},
             { Infos: 'statsbots', Valeur: false},
             { Infos: 'levelup', Valeur: false}
         ]);
     }
-    await Infos.findOrCreate({ where: { Infos: 'openticket' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'ticketchannel' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'archiveticket' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'verifychannel' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'verifyrole' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'logs' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'WelcomeLeave' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'statsmembers' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'statsbots' }, defaults: { Valeur: false } });
-    await Infos.findOrCreate({ where: { Infos: 'levelup' }, defaults: { Valeur: false } });
+    const infosArray = [
+        'openticket',
+        'ticketchannel',
+        'archiveticket',
+        'verifychannel',
+        'verifyrole',
+        'MessageLogs',
+        'VocLogs',
+        'WelcomeLeave',
+        'statsmembers',
+        'statsbots',
+        'levelup'
+    ];
+
+    for (let info of infosArray) {
+        await Infos.findOrCreate({ where: { Infos: info }, defaults: { Valeur: false } });
+    }
     
     const Msg = require("../modules/Msg")
     await Msg.sync({ alter: true })
@@ -94,18 +110,24 @@ module.exports = async client => {
 
         ]);
     }
-    await Msg.findOrCreate({ where: { Infos: 'Welcome' } });
-    await Msg.findOrCreate({ where: { Infos: 'WelcomeTitle' } });
-    await Msg.findOrCreate({ where: { Infos: 'WelcomeFooter' } });
-    await Msg.findOrCreate({ where: { Infos: 'Leave' } });
-    await Msg.findOrCreate({ where: { Infos: 'LeaveTitle' } });
-    await Msg.findOrCreate({ where: { Infos: 'LeaveFooter' } });
-    await Msg.findOrCreate({ where: { Infos: 'Ticket' } });
-    await Msg.findOrCreate({ where: { Infos: 'Verify' } });
-    await Msg.findOrCreate({ where: { Infos: 'LevelUp' } });
-    await Msg.findOrCreate({ where: { Infos: 'RankTitle' } });
-    await Msg.findOrCreate({ where: { Infos: 'Rank' } });
-    await Msg.findOrCreate({ where: { Infos: 'NewRole' } });
+    const msgArray = [
+        'Welcome',
+        'WelcomeTitle',
+        'WelcomeFooter',
+        'Leave',
+        'LeaveTitle',
+        'LeaveFooter',
+        'Ticket',
+        'Verify',
+        'LevelUp',
+        'RankTitle',
+        'Rank',
+        'NewRole'
+    ];
+
+    for (let msg of msgArray) {
+        await Msg.findOrCreate({ where: { Infos: msg } });
+    }
 
     const HistoData = require("../modules/HistoData")
     await HistoData.sync({ alter: true });
@@ -118,9 +140,16 @@ module.exports = async client => {
             { Infos: 'Activity' }
         ]);
     }
-    await HistoData.findOrCreate({ where: { Infos: 'Ticket' } });
-    await HistoData.findOrCreate({ where: { Infos: 'Verify' } });
-    await HistoData.findOrCreate({ where: { Infos: 'Activity' } });
+    
+    const HistoDataArray = [
+        'Ticket',
+        'Verify',
+        'Activity'
+    ];
+
+    for (let histo of HistoDataArray) {
+        await HistoData.findOrCreate({ where: { Infos: histo } });
+    }
 
     const reactions = await Emojis.findAll();
 

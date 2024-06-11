@@ -14,7 +14,7 @@ module.exports = {
                 .setName("type")
                 .setDescription("Type de configuration")
                 .setRequired(true)
-                .addChoices({ name: 'ticket', value: 'ticket' }, { name: 'xp', value: 'xp' }, { name: 'vérification', value: 'verify' }, { name: 'logs', value: 'logs' }, { name: 'arrivées et départs', value: 'WelcomeLeave' }, { name: 'stats serveur', value: 'stats' }, { name: 'Message de level up', value: 'levelup' }, { name: 'Message de nouveau rôle', value: 'newrole' })
+                .addChoices({ name: 'ticket', value: 'ticket' }, { name: 'xp', value: 'xp' }, { name: 'vérification', value: 'verify' }, { name: 'MessageLogs', value: 'MessageLogs' }, {name: 'VocLogs', value: 'VocLogs' }, { name: 'arrivées et départs', value: 'WelcomeLeave' }, { name: 'stats serveur', value: 'stats' }, { name: 'Message de level up', value: 'levelup' }, { name: 'Message de nouveau rôle', value: 'NewRole' })
         )
         .addIntegerOption((options) =>
             options
@@ -35,156 +35,121 @@ module.exports = {
             }
         });
 
-        const checkTicket = await Admins.findOne({ where: { Module: "ticket", IDServeur: ServeurID } });
-        if (!checkTicket) await Admins.create({ IDServeur: ServeurID, Module: "ticket", Valeur: false });
+        const checkAdmin = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+        if (!checkAdmin) await Admins.create({ IDServeur: ServeurID, Module: ModuleType, Valeur: false });
 
-        const checkXP = await Admins.findOne({ where: { Module: "xp", IDServeur: ServeurID } });
-        if (!checkXP) await Admins.create({ IDServeur: ServeurID, Module: "xp", Valeur: false });
-
-        const checkVerify = await Admins.findOne({ where: { Module: "verify", IDServeur: ServeurID } });
-        if (!checkVerify) await Admins.create({ IDServeur: ServeurID, Module: "verify", Valeur: false });
-
-        const checkLogs = await Admins.findOne({ where: { Module: "logs", IDServeur: ServeurID } });
-        if (!checkLogs) await Admins.create({ IDServeur: ServeurID, Module: "logs", Valeur: false });
-
-        const checkLogsConfig = await Infos.findOne({ where: { Infos: "logs", IDServeur: ServeurID } });
-        if (!checkLogsConfig) await Infos.create({ IDServeur: ServeurID, Infos: "logs", Valeur: false });
-
-        const checkWelcomeLeave = await Admins.findOne({ where: { Module: "WelcomeLeave", IDServeur: ServeurID } });
-        if (!checkWelcomeLeave) await Admins.create({ IDServeur: ServeurID, Module: "WelcomeLeave", Valeur: false });
-
-        const checkWelcomeLeaveConfig = await Infos.findOne({ where: { Infos: "WelcomeLeave", IDServeur: ServeurID } });
-        if (!checkWelcomeLeaveConfig) await Infos.create({ IDServeur: ServeurID, Infos: "WelcomeLeave", Valeur: false });
-
-        const checkStats = await Admins.findOne({ where: { Module: "stats", IDServeur: ServeurID } });
-        if (!checkStats) await Admins.create({ IDServeur: ServeurID, Module: "stats", Valeur: false });
-
-        const checkStatsMembersConfig = await Infos.findOne({ where: { Infos: "statsmembers", IDServeur: ServeurID } });
-        if (!checkStatsMembersConfig) await Infos.create({ IDServeur: ServeurID, Infos: "statsmembers", Valeur: false });
-
-        const checkStatsBotsConfig = await Infos.findOne({ where: { Infos: "statsbots", IDServeur: ServeurID } });
-        if (!checkStatsBotsConfig) await Infos.create({ IDServeur: ServeurID, Infos: "statsbots", Valeur: false });
-
-        const checkLevelUp = await Admins.findOne({ where: { Module: "levelup", IDServeur: ServeurID } });
-        if (!checkLevelUp) await Admins.create({ IDServeur: ServeurID, Module: "levelup", Valeur: false });
-
-        const checkNewRole = await Admins.findOne({ where: { Module: "NewRole", IDServeur: ServeurID } });
-        if (!checkNewRole) await Admins.create({ IDServeur: ServeurID, Module: "NewRole", Valeur: false });
+        const checkConfig = await Infos.findOne({ where: { Infos: ModuleType, IDServeur: ServeurID } });
+        if (!checkConfig) await Infos.create({ IDServeur: ServeurID, Infos: ModuleType, Valeur: false });
 
         try {
-            if (ModuleType === "ticket") {
-                await Admins.findOne({ where: { Module: "ticket", IDServeur: ServeurID } }).then(async (data) => {
-                    if (!data) {
-                        await Admins.create({ IDServeur: ServeurID, Module: "ticket", Valeur: false });
+            switch (ModuleType) {
+                case "ticket": {
+                    const checkTicket = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (ModuleValue.value === 1) {
+                        if (checkTicket.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkTicket.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
                     }
-                });
-                if (ModuleValue.value === 1) {
-                    if (checkTicket.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
-                    await Admins.update({ Valeur: true }, { where: { Module: "ticket", IDServeur: ServeurID } });
-                } else {
-                    if (checkTicket.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
-                    await Admins.update({ Valeur: false }, { where: { Module: "ticket", IDServeur: ServeurID } });
+                    break;
                 }
-            }
-            if (ModuleType === "xp") {
-                await Admins.findOne({ where: { Module: "xp", IDServeur: ServeurID } }).then(async (data) => {
-                    if (!data) {
-                        await Admins.create({ IDServeur: ServeurID, Module: "xp", Valeur: false });
+                case "xp": {
+                    const checkXP = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (ModuleValue.value === 1) {
+                        if (checkXP.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkXP.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
                     }
-                });
-                if (ModuleValue.value === 1) {
-                    if (checkXP.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
-                    await Admins.update({ Valeur: true }, { where: { Module: "xp", IDServeur: ServeurID } });
-                } else {
-                    if (checkXP.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
-                    await Admins.update({ Valeur: false }, { where: { Module: "xp", IDServeur: ServeurID } });
+                    break;
                 }
-            }
-            if (ModuleType === "verify"){
-                await Admins.findOne({ where: { Module: "verify", IDServeur: ServeurID } }).then(async (data) => {
-                    if (!data) {
-                        await Admins.create({ IDServeur: ServeurID, Module: "verify", Valeur: false });
+                case "verify": {
+                    const checkVerify = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (ModuleValue.value === 1) {
+                        if (checkVerify.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkVerify.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
                     }
-                });
-                if (ModuleValue.value === 1) {
-                    if (checkVerify.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
-                    await Admins.update({ Valeur: true }, { where: { Module: "verify", IDServeur: ServeurID } });
-                } else {
-                    if (checkVerify.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
-                    await Admins.update({ Valeur: false }, { where: { Module: "verify", IDServeur: ServeurID } });
+                    break;
                 }
-            }
-            if (ModuleType === "logs") {
-                await Admins.findOne({ where: { Module: "logs", IDServeur: ServeurID } }).then(async (data) => {
-                    if (!data) {
-                        await Admins.create({ IDServeur: ServeurID, Module: "logs", Valeur: false });
+                case "MessageLogs": {
+                    const checkMessageLogsConfig = await Infos.findOne({ where: { Infos: ModuleType, IDServeur: ServeurID } });
+                    const checkMessageLogs = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (checkMessageLogsConfig.Valeur === false) return message.reply({ content: "Le module de logs pour les messages n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
+                    if (ModuleValue.value === 1) {
+                        if (checkMessageLogs.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkMessageLogs.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
                     }
-                });
-                if (checkLogsConfig.Valeur === false) return message.reply({ content: "Le module de logs n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
-                if (ModuleValue.value === 1) {
-                    if (checkLogs.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
-                    await Admins.update({ Valeur: true }, { where: { Module: "logs", IDServeur: ServeurID } });
-                } else {
-                    if (checkLogs.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
-                    await Admins.update({ Valeur: false }, { where: { Module: "logs", IDServeur: ServeurID } });
+                    break;
                 }
-            }
-            if (ModuleType === "WelcomeLeave") {
-                await Admins.findOne({ where: { Module: "WelcomeLeave", IDServeur: ServeurID } }).then(async (data) => {
-                    if (!data) {
-                        await Admins.create({ IDServeur: ServeurID, Module: "WelcomeLeave", Valeur: false });
+                case "VocLogs": {
+                    const checkVocLogsConfig = await Infos.findOne({ where: { Infos: ModuleType, IDServeur: ServeurID } });
+                    const checkVocLogs = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (checkVocLogsConfig.Valeur === false) return message.reply({ content: "Le module de logs pour les vocaux n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
+                    if (ModuleValue.value === 1) {
+                        if (checkVocLogs.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkVocLogs.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
                     }
-                });
-                if (checkWelcomeLeaveConfig.Valeur === false) return message.reply({ content: "Le module d'arrivées et départs n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
-                if (ModuleValue.value === 1) {
-                    if (checkWelcomeLeave.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
-                    await Admins.update({ Valeur: true }, { where: { Module: "WelcomeLeave", IDServeur: ServeurID } });
-                } else {
-                    if (checkWelcomeLeave.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
-                    await Admins.update({ Valeur: false }, { where: { Module: "WelcomeLeave", IDServeur: ServeurID } });
+                    break;
+                }   
+                case "WelcomeLeave": {
+                    const checkWelcomeLeaveConfig = await Infos.findOne({ where: { Infos: ModuleType, IDServeur: ServeurID } });
+                    const checkWelcomeLeave = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (checkWelcomeLeaveConfig.Valeur === false) return message.reply({ content: "Le module d'arrivées et départs n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
+                    if (ModuleValue.value === 1) {
+                        if (checkWelcomeLeave.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkWelcomeLeave.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    }
+                    break;
                 }
-            }
-            if (ModuleType === "stats") {
-                await Admins.findOne({ where: { Module: "stats", IDServeur: ServeurID } }).then(async (data) => {
-                    if (!data) {
-                        await Admins.create({ IDServeur: ServeurID, Module: "stats", Valeur: false });
+                case "stats": {
+                    const checkStatsMembersConfig = await Infos.findOne({ where: { Infos: "statsMembers", IDServeur: ServeurID } });
+                    const checkStatsBotsConfig = await Infos.findOne({ where: { Infos: "statsBots", IDServeur: ServeurID } });
+                    const checkStats = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (checkStatsMembersConfig.Valeur === false && checkStatsBotsConfig.Valeur === false) return message.reply({ content: "Le module de stats n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
+                    if (ModuleValue.value === 1) {
+                        if (checkStats.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkStats.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
                     }
-                });
-                if (checkStatsMembersConfig.Valeur === false && checkStatsBotsConfig.Valeur === false) return message.reply({ content: "Le module de stats n'est pas configuré. Merci de le faire avec la commande /config avant de l'activer", ephemeral: true });
-                if (ModuleValue.value === 1) {
-                    if (checkStats.Valeur === true) return message.reply({ content: "Le module est déjà activé", ephemeral: true });
-                    await Admins.update({ Valeur: true }, { where: { Module: "stats", IDServeur: ServeurID } });
-                } else {
-                    if (checkStats.Valeur === false) return message.reply({ content: "Le module est déjà désactivé", ephemeral: true });
-                    await Admins.update({ Valeur: false }, { where: { Module: "stats", IDServeur: ServeurID } });
+                    break;
                 }
-            }
-            if (ModuleType === "levelup") {
-                await Admins.findOne({ where: { Module: "levelup", IDServeur: ServeurID } }).then(async (data) => {
-                    if (!data) {
-                        await Admins.create({ IDServeur: ServeurID, Module: "levelup", Valeur: false });
+                case "levelup": {
+                    const checkLevelUp = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (ModuleValue.value === 1) {
+                    if (checkLevelUp.Valeur === true) return message.reply({ content: "Les messages de levelup sont déjà activés", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkLevelUp.Valeur === false) return message.reply({ content: "Les messages de levelup sont déjà désactivés", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
                     }
-                });
-                if (ModuleValue.value === 1) {
-                   if (checkLevelUp.Valeur === true) return message.reply({ content: "Les messages de levelup sont déjà activés", ephemeral: true });
-                    await Admins.update({ Valeur: true }, { where: { Module: "levelup", IDServeur: ServeurID } });
-                } else {
-                    if (checkLevelUp.Valeur === false) return message.reply({ content: "Les messages de levelup sont déjà désactivés", ephemeral: true });
-                    await Admins.update({ Valeur: false }, { where: { Module: "levelup", IDServeur: ServeurID } });
+                    break;
                 }
-            }
-            if (ModuleType === "newrole") {
-                await Admins.findOne({ where: { Module: "NewRole", IDServeur: ServeurID } }).then(async (data) => {
-                    if (!data) {
-                        await Admins.create({ IDServeur: ServeurID, Module: "NewRole", Valeur: false });
+                case "NewRole": {
+                    const checkNewRole = await Admins.findOne({ where: { Module: ModuleType, IDServeur: ServeurID } });
+                    if (ModuleValue.value === 1) {
+                    if (checkNewRole.Valeur === true) return message.reply({ content: "Les messages de nouveau rôle sont déjà activés", ephemeral: true });
+                        await Admins.update({ Valeur: true }, { where: { Module: ModuleType, IDServeur: ServeurID } });
+                    } else {
+                        if (checkNewRole.Valeur === false) return message.reply({ content: "Les messages de nouveau rôle sont déjà désactivés", ephemeral: true });
+                        await Admins.update({ Valeur: false }, { where: { Module: ModuleType, IDServeur: ServeurID } });
                     }
-                });
-                if (ModuleValue.value === 1) {
-                   if (checkNewRole.Valeur === true) return message.reply({ content: "Les messages de nouveau rôle sont déjà activés", ephemeral: true });
-                    await Admins.update({ Valeur: true }, { where: { Module: "NewRole", IDServeur: ServeurID } });
-                } else {
-                    if (checkNewRole.Valeur === false) return message.reply({ content: "Les messages de nouveau rôle sont déjà désactivés", ephemeral: true });
-                    await Admins.update({ Valeur: false }, { where: { Module: "NewRole", IDServeur: ServeurID } });
+                    break;
                 }
             }
             await message.reply({ content: "La configuration a bien été enregistrée", ephemeral: true });

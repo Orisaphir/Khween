@@ -5,27 +5,23 @@ const Admins = require('../modules/Admin');
 
 async function getdate() {
     let date = new Date();
-	let heure = date.getHours();
-	if (heure < 10) {
-		heure = "0" + heure;
-	}
-	let minute = date.getMinutes();
-	if (minute < 10) {
-		minute = "0" + minute;
-	}
-    let sec = date.getSeconds();
-    if (sec < 10) {
-        sec = "0" + sec;
-    }
-	let message = `${heure}h${minute} et ${sec} secondes`;
-	return message;
+    let options = { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    let frenchDate = new Intl.DateTimeFormat('fr-FR', options).format(date);
+
+    let timeParts = frenchDate.split(':');
+    let heure = timeParts[0];
+    let minute = timeParts[1];
+    let sec = timeParts[2];
+
+    let message = `${heure}h${minute} et ${sec} secondes`;
+    return message;
 }
 
 
 module.exports = async (client, oldState, newState) => {
     const serveurID = oldState.guild.id || newState.guild.id;
     if (oldState.member.user.bot || newState.member.user.bot) return;
-    const AdminCheck = await Admins.findOne({ where: { Module: 'logs', IDServeur: serveurID } });
+    const AdminCheck = await Admins.findOne({ where: { Module: 'VocLogs', IDServeur: serveurID } });
     if (AdminCheck.Valeur === false) return;
     let orisaphir = null;
     try {
@@ -36,15 +32,14 @@ module.exports = async (client, oldState, newState) => {
         console.log(`Erreur lors de la récupération de Ori : ${err}`);
     }
     try {
-        const CheckLogs = await Infos.findOne({ where: { Infos: 'logs', IDServeur: serveurID } });
+        const CheckLogs = await Infos.findOne({ where: { Infos: 'VocLogs', IDServeur: serveurID } });
         if (oldState.channel === null && newState.channel !== null) {
             const user = newState.member.displayName;
             const username = newState.member.user.username;
             const channel = newState.channel;
             const heure = await getdate();
             if (CheckLogs.Valeur === true) {
-                const logsInfo = await Infos.findOne( { where: { Infos: 'logs', IDServeur: serveurID } });
-                const logsChannel = newState.guild.channels.cache.get(logsInfo.DiscordID);
+                const logsChannel = newState.guild.channels.cache.get(CheckLogs.DiscordID);
                 const embed = new EmbedBuilder()
                     .setTitle(`Logs de connexion à un salon vocal (${username})`)
                     .setDescription(`**${user}** a rejoint le salon **${channel.name}** à ${heure}`)
@@ -60,8 +55,7 @@ module.exports = async (client, oldState, newState) => {
             const channel = oldState.channel;
             const heure = await getdate();
             if (CheckLogs.Valeur === true) {
-                const logsInfo = await Infos.findOne( { where: { Infos: 'logs' }, IDServeur: serveurID });
-                const logsChannel = oldState.guild.channels.cache.get(logsInfo.DiscordID);
+                const logsChannel = oldState.guild.channels.cache.get(CheckLogs.DiscordID);
                 const embed = new EmbedBuilder()
                     .setTitle(`Logs de déconnexion à un salon vocal (${username})`)
                     .setDescription(`**${user}** a quitté le salon **${channel.name}** à ${heure}`)
@@ -73,7 +67,7 @@ module.exports = async (client, oldState, newState) => {
         }
     } catch (err) {
         try {
-            AdminCheck.update({ Valeur: false }, { where: { Module: 'logs', IDServeur: serveurID } });
+            AdminCheck.update({ Valeur: false }, { where: { Module: 'VocLogs', IDServeur: serveurID } });
             if(orisaphir === null || orisaphir === undefined) {
                 return console.log(`Erreur : ${err}`);
             }

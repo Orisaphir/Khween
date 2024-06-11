@@ -115,3 +115,5 @@ config.json
 .DS_Store
 
 config_backup.json
+
+deletedMessages.json

@@ -1,4 +1,5 @@
 const { PermissionFlagsBits, SlashCommandBuilder, ChannelType } = require("discord.js");
+const fs = require("fs");
 
 module.exports = {
 
@@ -21,6 +22,8 @@ module.exports = {
         try {
 
             const messages = await channel.bulkDelete(number)
+
+            fs.writeFileSync('deletedMessages.json', JSON.stringify({ ID: client.user.id, Executor: message.user.id, AutoMod: false, Reason: "Clear" }))
 
             await message.followUp({content: `\`${messages.size}\` message(s) supprimé(s) dans le salon ${channel}!`, ephemeral: true})
 

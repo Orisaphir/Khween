@@ -1,5 +1,6 @@
 const { EmbedBuilder, AuditLogEvent } = require('discord.js');
 const axios = require('axios');
+const fs = require('fs');
 
 module.exports = async (client, message) => {
     const Emojis = require('../modules/Emojis');
@@ -31,10 +32,11 @@ module.exports = async (client, message) => {
     }
         
 
-    const LogChannel = await Infos.findOne({ where: { Infos: "logs", IDServeur: serveurID } });
-    const LogOn = await Admins.findOne({ where: { Module: "logs", IDServeur: serveurID } });
+    const LogChannel = await Infos.findOne({ where: { Infos: "MessageLogs", IDServeur: serveurID } });
+    const LogOn = await Admins.findOne({ where: { Module: "MessageLogs", IDServeur: serveurID } });
     let fetchLog = await message.guild.fetchAuditLogs({
-        type: AuditLogEvent.MessageDelete
+        targetType: 'Message',
+        actionType: 'Delete'
     });
     let logmember = fetchLog.entries.first();
     let { executorId } = logmember;
@@ -42,6 +44,19 @@ module.exports = async (client, message) => {
     let executor = `<@${executoruser.user.id}>`;
     if (logmember.createdTimestamp < Date.now() - 1500) {
         executor = `${message.author}`;
+    }
+    if (fs.existsSync(`deletedMessages.json`)) {
+        let data = fs.readFileSync(`deletedMessages.json`);
+        let json = JSON.parse(data);
+        switch (json.Reason) {
+            case "Clear":
+                executor = `<@${json.ID}>\n\nAutoMod: ${json.AutoMod}\nReason: **/clear** par <@${json.Executor}>`;
+                break;
+            case "Invite":
+                executor = `<@${json.ID}>\n\nAutoMod: ${json.AutoMod}\nReason: **Lien d'invitation Discord** envoyé par <@${json.Executor}>`;
+                break;
+        }
+        fs.rmSync(`deletedMessages.json`);
     }
     if (LogOn.Valeur === true && LogChannel.DiscordID !== null) {
         let attachments = message.attachments;

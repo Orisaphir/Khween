@@ -7,6 +7,7 @@ const Infos = require("../modules/Infos")
 const Reward = require("../modules/Reward")
 const BLChannels = require("../modules/BlackListChannels")
 const Cooldown = require("../modules/Cooldown")
+const fs = require('fs');
 
 module.exports = async (client, message, member) => {
 
@@ -15,6 +16,13 @@ module.exports = async (client, message, member) => {
 
     if (message.author.bot) return;
     if (message.channel.type === "dm") return;
+
+    if (message.content.includes("discord.gg/") || message.content.includes("discord.com/invite/")) {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            fs.writeFileSync('deletedMessages.json', JSON.stringify({ ID: client.user.id, Executor: message.author.id, AutoMod: true, Reason: "Invite" }))
+            message.delete();
+        }
+    }
 
     if (message.content.startsWith("%lock")) {
         if (!message.member.permissions.has(PermissionFlagsBits.ManageChannels)) return
