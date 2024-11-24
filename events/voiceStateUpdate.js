@@ -43,7 +43,7 @@ module.exports = async (client, oldState, newState) => {
                 const embed = new EmbedBuilder()
                     .setTitle(`Logs de connexion à un salon vocal (${username})`)
                     .setDescription(`**${user}** a rejoint le salon **${channel.name}** à ${heure}`)
-                    .setColor('#FF0000')
+                    .setColor('#00FF00')
                     .setTimestamp();
                 logsChannel.send({ embeds: [embed] });
             }
