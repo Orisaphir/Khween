@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { warnPut, quit } = require("../index")
+const { warnPut, quit, ErrorCode } = require("../utils/utils.js");
 
 module.exports = async client => {
 
@@ -15,6 +15,6 @@ module.exports = async client => {
     }
     catch (e) {
         warnPut(`Erreur lors du chargement des commandes: ${e}`);
-        quit(ErreurCode.CriticalError);
+        quit(ErrorCode.CriticalError);
     }
 }

@@ -2,7 +2,7 @@ const { InteractionType, PermissionFlagsBits, ChannelType, EmbedBuilder, ActionR
 const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
 const Admins = require('../modules/Admin')
 const Infos = require('../modules/Infos');
-const { put } = require('../index');
+const { put } = require('../utils/utils');
 const Ori = `<@421416465430741003>`
 
 async function getdate() {

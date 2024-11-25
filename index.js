@@ -1,5 +1,7 @@
 //Modules pour le fonctionnement du programme
 const { Khween } = require('./app.js');
+const { CheckAndFix } = require('./fix/fix.js');
+const { put, greenPut, infoPut, warnPut, progress, ErrorCode } = require('./utils/utils.js');
 const fs = require('fs');
 const extract_zip = require('extract-zip');
 const path = require('path');
@@ -73,15 +75,6 @@ const { Player } = require('discord-player');
 client.config = require('./playerconf.js');
 global.player = new Player(client, client.config.opt.discordPlayer);
 
-//Variable pour les erreurs
-var ErreurCode;
-(function (ErreurCode){
-    ErreurCode[ErreurCode["None"] = 0] = "None";
-    ErreurCode[ErreurCode["InvalidValue"] = 1] = "InvalidValue";
-    ErreurCode[ErreurCode["UpdateFailed"] = 2] = "UpdateFailed";
-    ErreurCode[ErreurCode["CriticalError"] = 3] = "CriticalError";
-})(ErreurCode || (ErreurCode = {}));
-
 //Login
 main()
 
@@ -115,7 +108,7 @@ async function init() {
             let updateSuccess = await update();
             if (updateSuccess === true) {
                 greenPut(`\nMise à jour terminée. Veuillez redémarrer Khween.`);
-                quit(ErreurCode.None);
+                quit(ErrorCode.None);
             }
             warnPut('Erreur: Échec de la mise à jour de Khween.');
         } else {
@@ -124,43 +117,16 @@ async function init() {
     } else if (newUpdate === false) {
         greenPut('Aucune mise à jour disponible.\n');
     }
+    infoPut('\nVérification des fichiers...\n');
+    await CheckAndFix();
     infoPut('\nConnexion à Discord...\n');
     await loginWithRetry();
     client.commands = [];
     infoPut('\n\nChargement des commandes...')
     loadCommands(client);
     loadEvents(client);
+    Khween.client = client;
 }
-
-function quit(code = ErreurCode.None) {
-    warnPut('\nFermeture de Khween... Erreur: ' + code)
-    process.exit(code);
-}
-exports.quit = quit;
-
-function put(text) {
-    console.log(text);
-}
-exports.put = put;
-function warnPut(text) {
-    console.log('\x1b[31m' + text + '\x1b[0m');
-}
-exports.warnPut = warnPut;
-function greenPut(text) {
-    console.log('\x1b[32m' + text + '\x1b[0m');
-}
-exports.greenPut = greenPut;
-function infoPut(text) {
-    console.log('\x1b[33m' + text + '\x1b[0m');
-}
-exports.infoPut = infoPut;
-
-function progress(percent = 0) {
-    let buff = ''.padStart(Math.round(percent * 35), '#').padEnd(35, ' ');
-    put('\r                                       ');
-    put('\r[' + buff + '] ' + Math.round(percent * 100).toString() + '%');
-}
-exports.progress = progress;
 
 async function unzip(zip_file_path, to_directory) {
     try {
@@ -264,7 +230,7 @@ async function update() {
     }
     catch (e) {
         warnPut(`Erreur: Impossible de lire les données de Github.`);
-        quit(ErreurCode.InvalidValue);
+        quit(ErrorCode.InvalidValue);
         return false;
     }
     latest = data[0];
@@ -274,7 +240,7 @@ async function update() {
     }
     catch (e) {
         warnPut(`Erreur: Impossible de télécharger la mise à jour.`);
-        quit(ErreurCode.UpdateFailed);
+        quit(ErrorCode.UpdateFailed);
         return false;
     }
     progress(0.1);
@@ -284,7 +250,7 @@ async function update() {
     }
     catch (e) {
         warnPut('Erreur: Données reçues de Github invalides.');
-        quit(ErreurCode.InvalidValue)
+        quit(ErrorCode.InvalidValue)
         return false;
     }
     progress(0.2);
@@ -307,7 +273,7 @@ async function update() {
     catch (e) {
         warnPut('Erreur: Impossible de supprimer les fichiers, une réinstallation manuelle est nécessaire. Les fichiers tels que les bases de données et le fichier config.json ont été sauvegardés dans le dossier TEMP.');
         warnPut(`\n\nErreur: ${e}\n`)
-        quit(ErreurCode.CriticalError);
+        quit(ErrorCode.CriticalError);
         return false;
     }
     progress(0.5);
@@ -315,7 +281,7 @@ async function update() {
     progress(0.6);
     if (fs.existsSync('./Khween-main') === false) {
         warnPut(`Erreur: Impossible d'extraire les fichiers de la mise à jour. Une réinstallation manuelle est nécessaire. Les fichiers tels que les bases de données et le fichier config.json ont été sauvegardés dans le dossier TEMP.`);
-        quit(ErreurCode.CriticalError);
+        quit(ErrorCode.CriticalError);
         return false;
     };
     progress(0.7);

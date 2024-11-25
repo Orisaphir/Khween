@@ -39,8 +39,9 @@ Rajouter une commande pour instaurer un cooldown à la génération d'xp/message
 ### [x] v0.6.0
 Faire un starboard
 
-### [ ] v0.6.1
-Faire une commande /embed
+### [x] v0.6.1
+~~Faire une commande /embed~~
+Ajout du support de Twitch
 
 ### [ ] v0.6.2
 Pour la commande /rr, faire en sorte que l'utilisateur puisse indiquer le lien du message et que le bot récupère l'id tout seul

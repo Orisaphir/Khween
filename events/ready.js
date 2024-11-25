@@ -1,7 +1,8 @@
 const loadSlashCommands = require("../loaders/loadSlash")
 const { ActivityType } = require("discord.js")
 const { Khween } = require("../app.js")
-const { progress, searchMaster, put, infoPut, greenPut } = require("../index.js")
+const { progress, put, infoPut, greenPut } = require("../utils/utils.js")
+const { searchMaster } = require("../index.js")
 
 module.exports = async client => {
 
@@ -185,6 +186,12 @@ module.exports = async client => {
     const StarboardFiltre = require("../modules/StarboardFiltre")
     await StarboardFiltre.sync();
 
+    const twitch = require("../modules/Twitch")
+    await twitch.sync();
+
+    const twitchchannels = require("../modules/TwitchChannel")
+    await twitchchannels.sync();
+
     const reaction2 = await StarboardHisto.findAll();
 
     reaction2.forEach(async data => {
@@ -236,4 +243,28 @@ module.exports = async client => {
     }
 
     client.user.setPresence({ activities: [{ name: Khween.activity_name, type: activityType, url: activity_url }], status: Khween.activity_status })
+
+    const { setTwitchInstance } = require('../twitch/instance');
+    const TwitchInfos = await twitch.findOne({ where: { Valeur: true } });
+    const TwitchChannelInfo = await twitchchannels.findAll();
+
+    if (TwitchInfos) {
+        const Twitch = require("../twitch/twitch")
+        const twitchBot = new Twitch(
+            [TwitchInfos.get("Channel")],
+            [],
+            {
+                id: TwitchInfos.get("ClientID"),
+                secret: TwitchInfos.get("ClientSecret"),
+                token: TwitchInfos.get("Token")
+            }
+        );
+        if (TwitchChannelInfo) {
+            TwitchChannelInfo.forEach(info => {
+                if (!Array.from(twitchBot.getChannels()).includes(info.Channel))
+                    twitchBot.addChannel(info.Channel);
+            });
+        }
+        setTwitchInstance(twitchBot);
+    }
 }

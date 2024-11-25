@@ -15,6 +15,7 @@ class Config {
 class KhweenApp {
     package = new Package();
     config = new Config();
+    client = null;
 
 }
 exports.KhweenApp = KhweenApp;

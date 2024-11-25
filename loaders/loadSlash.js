@@ -1,6 +1,6 @@
 const { Discord, Routes, SlashCommandBuilder, ReactionUserManager } = require("discord.js");
 const { REST } = require("@discordjs/rest")
-const { greenPut } = require("../index")
+const { greenPut } = require("../utils/utils.js")
 
 module.exports = async client => {
 
