@@ -77,6 +77,16 @@ module.exports = {
                 });
             };
 
+            const Instance = new twitch(
+                [TwitchChannel],
+                [],
+                {
+                    id: ClientID,
+                    secret: ClientSecret,
+                    token: '' // Use the blank for generating a new token
+                }
+            );
+
             // Wait for token to be captured
             const extractedToken = await waitForToken();
 

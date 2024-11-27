@@ -61,7 +61,7 @@ class twitch {
                         const ChannelAnnounce = ChannelAnnounceInfo.get("ChannelAnnounce");
                         const Serveur = await Khween.client.guilds.fetch(ServeurID);
                         const Channel = await Serveur.channels.cache.get(ChannelAnnounce);
-                        Channel.send(`🔴 ${stream.user_name} est en live sur https://twitch.tv/${streamer}`);
+                        Channel.send(`@everyone\n🔴 ${stream.user_name} est en live sur https://twitch.tv/${streamer}`);
                     }
                 });
             }
