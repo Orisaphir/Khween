@@ -62,8 +62,22 @@ class Twitch extends node_events_1.EventEmitter {
                     "client-id": this.client.id,
                     "Authorization": `Bearer ${this.client.token}`
                 }
-            }).then((res) => res.data).catch((err) => console.log(err));
-            const stream = data.data?.[0] || null;
+            }).then((res) => res.data).catch((err) => {
+                if (err.response.data && err.response.data.message) {
+                    if (err.response.data.message === 'Invalid OAuth token') {
+                        console.log('Token expired, fetching new one...');
+                        this.getToken().then((token) => {
+                            token ? this.client.token = token : console.warn('Failed to fetch token.')
+                            this.emit('newToken', {
+                                token: this.client.token,
+                                channel: this.client.channel
+                            });
+                        });
+                    }
+                }
+                else throw new Error(err);
+            });
+            const stream = data?.data?.[0] || null;
             if (!stream) {
                 if (this.liveChannels.has(channel))
                     this._streamEnded({ user_login: channel });

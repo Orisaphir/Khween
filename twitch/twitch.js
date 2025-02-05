@@ -2,6 +2,7 @@ const { Twitch } = require('@voidpkg/social-alert');
 const { Khween } = require('../app.js');
 const TwitchInfos = require('../modules/Twitch');
 const TwitchChannel = require('../modules/TwitchChannel');
+const { infoPut } = require('../utils/utils.js');
 
 class twitch {
     constructor(channels = [], liveChannels = [], client = { id: '', secret: '', token: '' }, interval = 10000) {
@@ -65,6 +66,13 @@ class twitch {
                     }
                 });
             }
+        });
+
+        this.twitch.on('newToken', async ({ token, channel }) => {
+            infoPut('Received new token for Twitch API.\n');
+            const TwitchInfo = await TwitchInfos.findOne({ where: { Channel: channel } });
+            if (TwitchInfo)
+                await TwitchInfo.update({ Token: token });
         });
     }
 
