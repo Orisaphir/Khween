@@ -6,6 +6,9 @@ const { infoPut, warnPut } = require('../utils/utils.js');
 
 class twitch {
     constructor(channels = [], liveChannels = [], client = { id: '', secret: '', token: '' }, interval = 10000) {
+        if (client && !client.channel && Array.isArray(channels) && channels.length > 0) {
+            client.channel = channels[0];
+        }
         this.twitch = new Twitch({
             channels: channels,
             liveChannels: liveChannels,
@@ -71,17 +74,21 @@ class twitch {
         this.twitch.on('newToken', async ({ token, channel }) => {
             infoPut('Received new token for Twitch API.\n');
             if (!channel) {
-                warnPut('[Twitch] Impossible de déterminer le channel (undefined). Désactivation du module Twitch dans la BDD.\n');
+                warnPut('[Twitch] Channel undefined dans newToken. Mise à jour du token pour le client Twitch actif uniquement.\n');
                 try {
-                    await TwitchInfos.update({ Valeur: false }, { where: { Valeur: true } });
+                    await TwitchInfos.update(
+                        { Token: token },
+                        { where: { ClientID: this.twitch.client.id, ClientSecret: this.twitch.client.secret } }
+                    );
                 } catch (e) {
-                    warnPut('[Twitch] Erreur lors de la désactivation du module Twitch dans la BDD: ' + e + '\n');
+                    warnPut('[Twitch] Erreur lors de la mise à jour du token Twitch dans la BDD: ' + e + '\n');
                 }
                 return;
             }
-            const TwitchInfo = await TwitchInfos.findOne({ where: { Channel: channel } });
-            if (TwitchInfo)
-                await TwitchInfo.update({ Token: token });
+            await TwitchInfos.update(
+                { Token: token },
+                { where: { ClientID: this.twitch.client.id, ClientSecret: this.twitch.client.secret, Channel: channel } }
+            );
         });
     }
 
