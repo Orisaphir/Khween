@@ -1,7 +1,7 @@
 //Modules pour le fonctionnement du programme
 const { Khween } = require('./app.js');
 const { CheckAndFix } = require('./fix/fix.js');
-const { put, greenPut, infoPut, warnPut, progress, ErrorCode } = require('./utils/utils.js');
+const { put, greenPut, infoPut, warnPut, progress, ErrorCode, quit } = require('./utils/utils.js');
 const fs = require('fs');
 const extract_zip = require('extract-zip');
 const path = require('path');
@@ -12,7 +12,7 @@ const Discord = require('discord.js');
 const intents = new Discord.IntentsBitField(3276799);
 
 //Discord Client
-global.client = new Discord.Client({intents}, {partials: [Discord.Partials.Message, Discord.Partials.Channel, Discord.Partials.GuildMember, Discord.Partials.User, Discord.Partials.Reaction, Discord.Partials.ThreadMember] });
+global.client = new Discord.Client({ intents }, { partials: [Discord.Partials.Message, Discord.Partials.Channel, Discord.Partials.GuildMember, Discord.Partials.User, Discord.Partials.Reaction, Discord.Partials.ThreadMember] });
 
 //Loading
 const loadCommands = require("./loaders/loadCommands.js");
@@ -130,7 +130,7 @@ async function init() {
 
 async function unzip(zip_file_path, to_directory) {
     try {
-        await (0, extract_zip)(path.resolve(zip_file_path), {dir: path.resolve(to_directory)});
+        await (0, extract_zip)(path.resolve(zip_file_path), { dir: path.resolve(to_directory) });
         return true;
     }
     catch (e) {
@@ -390,7 +390,7 @@ async function searchMaster() {
     }
 }
 exports.searchMaster = searchMaster;
-async function readlineOpen(){
+async function readlineOpen() {
     const readline = require('readline').createInterface({
         input: process.stdin,
         output: process.stdout
@@ -398,7 +398,7 @@ async function readlineOpen(){
     return readline;
 }
 exports.readlineOpen = readlineOpen;
-async function readlineClose(readline){
+async function readlineClose(readline) {
     readline.close();
 }
 exports.readlineClose = readlineClose;
