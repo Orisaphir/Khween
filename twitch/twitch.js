@@ -2,7 +2,7 @@ const { Twitch } = require('@voidpkg/social-alert');
 const { Khween } = require('../app.js');
 const TwitchInfos = require('../modules/Twitch');
 const TwitchChannel = require('../modules/TwitchChannel');
-const { infoPut } = require('../utils/utils.js');
+const { infoPut, warnPut } = require('../utils/utils.js');
 
 class twitch {
     constructor(channels = [], liveChannels = [], client = { id: '', secret: '', token: '' }, interval = 10000) {
@@ -70,6 +70,15 @@ class twitch {
 
         this.twitch.on('newToken', async ({ token, channel }) => {
             infoPut('Received new token for Twitch API.\n');
+            if (!channel) {
+                warnPut('[Twitch] Impossible de déterminer le channel (undefined). Désactivation du module Twitch dans la BDD.\n');
+                try {
+                    await TwitchInfos.update({ Valeur: false }, { where: { Valeur: true } });
+                } catch (e) {
+                    warnPut('[Twitch] Erreur lors de la désactivation du module Twitch dans la BDD: ' + e + '\n');
+                }
+                return;
+            }
             const TwitchInfo = await TwitchInfos.findOne({ where: { Channel: channel } });
             if (TwitchInfo)
                 await TwitchInfo.update({ Token: token });
